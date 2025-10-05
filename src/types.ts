@@ -43,6 +43,7 @@ export interface Nameplate {
   value: string;
   padding: { x: number; y: number };
   angle: number;
+  alpha: number;
 }
 
 export interface NameplateConfiguration {

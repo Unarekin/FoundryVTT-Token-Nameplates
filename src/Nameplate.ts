@@ -22,6 +22,7 @@ export class Nameplate {
     this.padding.y = config.padding?.y ?? 0;
     this.sort = config.sort ?? 0;
     this.angle = config.angle ?? 0;
+    this.alpha = config.alpha ?? 1;
     if (config.style) this.style = config.style;
 
     return this;
@@ -45,6 +46,7 @@ export class Nameplate {
       sort: this.sort,
       value: this.text,
       angle: this.angle,
+      alpha: this.alpha,
       padding: {
         x: this.padding.x,
         y: this.padding.y
@@ -106,6 +108,9 @@ export class Nameplate {
 
   public get angle() { return this.object.angle; }
   public set angle(val) { this.object.angle = val; }
+
+  public get alpha() { return this.object.alpha; }
+  public set alpha(val) { this.object.alpha = val; }
 
   public destroy() {
     if (!this.object.destroyed) this.object.destroy();
