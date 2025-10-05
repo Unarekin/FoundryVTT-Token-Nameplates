@@ -1,0 +1,111 @@
+import { NameplatePosition } from "./types";
+import { Nameplate as NameplateConfig } from "./types";
+
+export class Nameplate {
+  #position: NameplatePosition = "bottom";
+  #id = foundry.utils.randomID();
+
+  public get id() { return this.#id; }
+
+  public static deserialize(config: NameplateConfig): Nameplate {
+    return new Nameplate(config.value).deserialize(config);
+  }
+
+  public deserialize(config: NameplateConfig): this {
+    console.log("Deserializing nameplate:", config);
+    this.#id = config.id ?? foundry.utils.randomID();
+    this.text = config.value ?? "";
+    this.position = config.position ?? "bottom";
+    this.padding.x = config.padding?.x ?? 0;
+    this.padding.y = config.padding?.y ?? 0;
+    this.sort = config.sort ?? 0;
+    this.angle = config.angle ?? 0;
+    if (config.style) this.style = config.style;
+
+    return this;
+  }
+
+  public serializeStyle(): Record<string, unknown> {
+    const style = JSON.parse(JSON.stringify(this.style)) as Record<string, unknown>;
+    for (const key in style) {
+      if (key.startsWith("_")) {
+        style[key.substring(1)] = style[key];
+        delete style[key];
+      }
+    }
+    return style;
+  }
+
+  public serialize(): NameplateConfig {
+    return {
+      id: this.id,
+      position: this.position,
+      sort: this.sort,
+      value: this.text,
+      angle: this.angle,
+      padding: {
+        x: this.padding.x,
+        y: this.padding.y
+      },
+      style: this.serializeStyle()
+    }
+  }
+
+  public readonly object: foundry.canvas.containers.PreciseText;
+
+  public sort = 0;
+
+  public readonly padding = { x: 0, y: 0 };
+
+  public get position() { return this.#position; }
+  public set position(val) {
+    if (val !== this.position) this.#position = val;
+  }
+
+  public get style() { return this.object.style; }
+  public set style(val: PIXI.TextStyle | Record<string, unknown>) {
+    if (!foundry.utils.objectsEqual(val, this.style)) {
+      this.object.style = val;
+    }
+  }
+
+  public get text() { return this.object.text; }
+  public set text(val) { this.object.text = val; }
+
+  public get visible() { return this.object.visible; }
+  public set visible(val) { this.object.visible = val; }
+
+  public get x() { return this.object.x; }
+  public set x(val) { this.object.x = val; }
+
+  public get y() { return this.object.y; }
+  public set y(val) { this.object.y = val; }
+
+  public get height() { return this.object.height; }
+  public set height(val) { this.object.height = val; }
+
+  public get width() { return this.object.width; }
+  public set width(val) { this.object.width = val; }
+
+  public get anchor() { return this.object.anchor; }
+  public set anchor(val) { this.object.anchor = val; }
+
+  public get align() { return this.object.style.align; }
+  public set align(val) { this.object.style.align = val; }
+
+  public get angle() { return this.object.angle; }
+  public set angle(val) { this.object.angle = val; }
+
+  public destroy() {
+    if (!this.object.destroyed) this.object.destroy();
+  }
+
+  constructor(text?: string)
+  constructor(text?: foundry.canvas.containers.PreciseText)
+  constructor(arg?: unknown) {
+    if (arg instanceof foundry.canvas.containers.PreciseText)
+      this.object = arg;
+    else
+      this.object = new foundry.canvas.containers.PreciseText(typeof arg === "string" ? arg : "");
+  }
+}
