@@ -28,7 +28,8 @@ export const NameplatePositions = ["top", "bottom"] as const;
 export type NameplatePosition = typeof NameplatePositions[number];
 
 export interface TokenNameplates {
-  tokens: WeakMap<foundry.canvas.placeables.Token, NameplateToken>;
+  // tokens: WeakMap<foundry.canvas.placeables.Token, NameplateToken>;
+  tokens: NameplateToken[];
 }
 
 type PropsCoercedToPOrNeverOnO<O, P> = { [k in keyof O]: O[k] extends P ? k : never }[keyof O];

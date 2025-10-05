@@ -22,24 +22,23 @@ export class NameplateToken {
   }
 
   public refreshTooltip() {
-    if (this.token.document?.flags[__MODULE_ID__]) {
-      // Process flags
-      const nameplates = this.token.document.getFlag(__MODULE_ID__, "nameplates");
-      this.setNameplates(nameplates);
-    }
+    this.refreshNameplate();
   }
 
   public refreshState() {
+    this.refreshNameplate();
     this.bottomNameplates.forEach(nameplate => { nameplate.visible = !!this.token.nameplate?.visible });
     this.topNameplates.forEach(nameplate => { nameplate.visible = !!this.token.tooltip?.visible; });
     this.refreshPosition();
   }
 
-  public draw() { /* Empty */ }
+  public draw() {
+    console.log("Draw:", this);
+  }
 
   public addText(text: string | foundry.canvas.containers.PreciseText, position?: NameplatePosition): Nameplate {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const nameplate = new Nameplate(text as any);
+    const nameplate = new Nameplate(this.token, text as any);
     if (position) nameplate.position = position;
     if (typeof text === "string") {
       const style = this.token.nameplate?.style.clone();
@@ -49,6 +48,7 @@ export class NameplateToken {
         nameplate.style = CONFIG.canvasTextStyle.clone();
         nameplate.style.fontSize = 24;
         nameplate.style.wordWrapWidth = this.token.width * 2.5;
+        nameplate.style.wordWrap = true;
       }
     }
 
@@ -99,7 +99,6 @@ export class NameplateToken {
   }
 
   public setNameplates(nameplates: NameplateItem[]) {
-    console.log("Setting nameplates:", nameplates);
     for (let i = 0; i < nameplates.length; i++) {
       const config = nameplates[i];
       const nameplate = this.nameplates[i] ?? this.addText(config.value);
@@ -150,22 +149,27 @@ export class NameplateToken {
     }
   }
 
-
   public destroy() {
     this.nameplates.forEach(nameplate => { nameplate.destroy(); });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public tokenUpdated(delta: DeepPartial<TokenDocument>) {
-    if (delta.flags?.[__MODULE_ID__]) {
-      console.log("Flags updated:", delta);
-    }
+    this.refreshNameplate();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public actorUpdated(delta: DeepPartial<Actor>) {
+    this.refreshNameplate();
   }
 
 
 
   constructor(public readonly token: foundry.canvas.placeables.Token) {
-    if (token.nameplate) this.addText(token.nameplate);
-    else console.log("No nameplate");
+    if (token.nameplate) {
+      const nameplate = this.addText(token.nameplate);
+      nameplate.text = "{name}";
+    }
 
     if (token.document?.flags[__MODULE_ID__]) {
       // Process flags

@@ -1,18 +1,20 @@
 import { NameplatePosition } from "./types";
 import { Nameplate as NameplateConfig } from "./types";
+import { interpolate, getInterpolationData } from "./functions";
 
 export class Nameplate {
   #position: NameplatePosition = "bottom";
   #id = foundry.utils.randomID();
 
+  #text = "";
+
   public get id() { return this.#id; }
 
-  public static deserialize(config: NameplateConfig): Nameplate {
-    return new Nameplate(config.value).deserialize(config);
+  public static deserialize(token: foundry.canvas.placeables.Token, config: NameplateConfig): Nameplate {
+    return new Nameplate(token, config.value).deserialize(config);
   }
 
   public deserialize(config: NameplateConfig): this {
-    console.log("Deserializing nameplate:", config);
     this.#id = config.id ?? foundry.utils.randomID();
     this.text = config.value ?? "";
     this.position = config.position ?? "bottom";
@@ -51,7 +53,7 @@ export class Nameplate {
     }
   }
 
-  public readonly object: foundry.canvas.containers.PreciseText;
+  public readonly object: foundry.canvas.containers.PreciseText | PIXI.HTMLText;
 
   public sort = 0;
 
@@ -69,8 +71,17 @@ export class Nameplate {
     }
   }
 
-  public get text() { return this.object.text; }
-  public set text(val) { this.object.text = val; }
+  public get text() { return this.#text }
+  public set text(val) {
+    this.#text = val;
+    const data = getInterpolationData(this.token.document);
+    if (this.object instanceof foundry.canvas.containers.PreciseText)
+      this.object.text = interpolate(val, data, true);
+    else if (this.object instanceof PIXI.HTMLText)
+      this.object.text = interpolate(val, data, false);
+  }
+
+  public get actualText() { return this.object.text; }
 
   public get visible() { return this.object.visible; }
   public set visible(val) { this.object.visible = val; }
@@ -100,12 +111,15 @@ export class Nameplate {
     if (!this.object.destroyed) this.object.destroy();
   }
 
-  constructor(text?: string)
-  constructor(text?: foundry.canvas.containers.PreciseText)
-  constructor(arg?: unknown) {
+
+
+  constructor(token: foundry.canvas.placeables.Token, text?: string)
+  constructor(token: foundry.canvas.placeables.Token, text?: foundry.canvas.containers.PreciseText)
+  constructor(public readonly token: foundry.canvas.placeables.Token, arg?: unknown) {
     if (arg instanceof foundry.canvas.containers.PreciseText)
       this.object = arg;
     else
       this.object = new foundry.canvas.containers.PreciseText(typeof arg === "string" ? arg : "");
+    this.object.style.wordWrap = true;
   }
 }
