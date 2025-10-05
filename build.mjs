@@ -181,7 +181,7 @@ if (buildResults.errors.length) {
 }
 
 // Types
-if (!__DEV__ || (__DEV__ && !process.argv.slice(2).includes("--no-types"))) {
+if (!__DEV__ || (__DEV__ && process.argv.slice(2).includes("--types"))) {
   const typeStart = Date.now();
   if (!process.env.GITHUB_ACTIONS)
     spinner = yoctoSpinner({ text: "Generating type declarations..." }).start();
