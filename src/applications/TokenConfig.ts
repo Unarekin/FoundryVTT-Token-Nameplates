@@ -3,6 +3,7 @@ import { DeepPartial, NameplateConfiguration } from "../types";
 import { generateFontSelectOptions } from "./functions";
 import { LocalizedError } from "../errors";
 import { NameplateConfigApplication } from "./NameplateConfig";
+import { DefaultNameplate, DefaultSettings } from "settings";
 
 
 export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenConfig) {
@@ -69,18 +70,13 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       try {
         if (!this.#flags) return;
         const highest = this.#flags.nameplates.reduce((prev, curr) => curr.position === "bottom" && curr.sort > prev ? curr.sort : prev, 0);
+
         const nameplate = await NameplateConfigApplication.Edit({
-          id: foundry.utils.randomID(),
-          sort: highest + 1,
-          position: "bottom",
+          ...foundry.utils.deepClone(DefaultNameplate),
           style: serializeStyle(CONFIG.canvasTextStyle.clone()),
-          value: "",
-          padding: { x: 0, y: 0 },
-          angle: 0,
-          alpha: 1
+          sort: highest + 1
         });
 
-        console.log("Nameplate:", nameplate);
         if (nameplate) {
           this.#flags.nameplates.push(nameplate);
           await this.render();
@@ -135,10 +131,38 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       }
     }
 
+    async _onSubmitForm(formConfig: foundry.applications.api.ApplicationV2.FormConfiguration, event: Event | SubmitEvent): Promise<void> {
+      if (!this.form) return;
+
+      const data = foundry.utils.expandObject(new foundry.applications.ux.FormDataExtended(this.form).object) as Record<string, unknown>;
+
+      const config: NameplateConfiguration = {
+        ...DefaultSettings,
+        ...(this.#flags ?? {}),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        enabled: (data.nameplates as any)?.enabled ?? true,
+        nameplates: Array.isArray(this.#flags?.nameplates) ? foundry.utils.deepClone(this.#flags.nameplates) : []
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const actor = ((this as any).token as foundry.canvas.placeables.Token).actor as Actor | undefined;
+
+      actor?.update({
+        flags: {
+          [__MODULE_ID__]: config
+        }
+      }).catch((err: Error) => {
+        console.error(err);
+        ui.notifications?.error(err.message, { console: false });
+      })
+
+      return super._onSubmitForm(formConfig, event);
+    }
+
     async _prepareContext(options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       const context = await super._prepareContext(options);
 
-      if (!this.#flags) {
+      if (options.force || options.isFirstRender || !this.#flags) {
         this.#flags = foundry.utils.mergeObject({
           enabled: true,
           version: __MODULE_VERSION__,
