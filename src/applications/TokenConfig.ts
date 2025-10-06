@@ -102,7 +102,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
         const confirmed = await confirm(
           "NAMEPLATES.CONFIG.REMOVE.TITLE",
-          "NAMEPLATES.CONFIG.REMOVE.CONTENT".replaceAll("\n", "<br>\n")
+          (game.i18n?.localize("NAMEPLATES.CONFIG.REMOVE.CONTENT") ?? "").replaceAll("\n", "<br>\n")
         );
         if (!confirmed) return;
 
@@ -138,13 +138,20 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
     async _prepareContext(options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       const context = await super._prepareContext(options);
 
+      console.log("Config:", this);
+
       if (!this.#flags) {
         this.#flags = foundry.utils.mergeObject({
           enabled: true,
           version: __MODULE_VERSION__,
           nameplates: []
         },
-          this.document.flags[__MODULE_ID__] ?? {}
+          {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            ...((this as any).actor.flags[__MODULE_ID__] ?? {}),
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            ...((this as any).token.flags[__MODULE_ID__] ?? {})
+          }
         ) as NameplateConfiguration;
       }
 
@@ -154,9 +161,12 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         enabled: this.#flags?.enabled ?? true,
         nameplates: (this.#flags?.nameplates ?? [])?.map(nameplate => ({
           ...nameplate,
-          actualValue: interpolate(nameplate.value, getInterpolationData(this.document))
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+          actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
         })) ?? [],
-        idPrefix: this.document.uuid.replaceAll(".", "-"),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        idPrefix: (this as any).token instanceof foundry.canvas.placeables.Token ? (this as any).token.uuid.replaceAll(".", "-") : `prototype-${(this as any).actor.uuid.replaceAll(".", "-")}`,
+        // idPrefix: (this as any).token.uuid.replaceAll(".", "-"),
         fontSelect: generateFontSelectOptions()
       }
 

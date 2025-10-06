@@ -84,4 +84,7 @@ Hooks.once("ready", () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const mixed = TokenConfigMixin(CONFIG.Token.sheetClasses.base["core.TokenConfig"].cls as any);
   CONFIG.Token.sheetClasses.base["core.TokenConfig"].cls = mixed;
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  CONFIG.Token.prototypeSheetClass = TokenConfigMixin(CONFIG.Token.prototypeSheetClass as any);
 })
