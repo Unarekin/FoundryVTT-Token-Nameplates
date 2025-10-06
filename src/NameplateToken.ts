@@ -14,9 +14,9 @@ export class NameplateToken {
   public refreshSize() { /* empty */ }
 
   public refreshNameplate() {
-    if (this.token.document?.flags[__MODULE_ID__]) {
+    if (this.token.actor?.flags[__MODULE_ID__]) {
       // Process flags
-      const nameplates = this.token.document.getFlag(__MODULE_ID__, "nameplates");
+      const nameplates = this.token.actor.getFlag(__MODULE_ID__, "nameplates");
       this.setNameplates(nameplates);
     }
   }
@@ -67,12 +67,12 @@ export class NameplateToken {
   public async saveToPrototype() {
     if (this.token.actor?.prototypeToken && game.user instanceof User && this.token.actor.canUserModify(game.user, "update")) {
       const flags: NameplateConfiguration = {
-        enabled: this.token.document.flags[__MODULE_ID__]?.enabled ?? true,
+        enabled: this.token.actor.flags[__MODULE_ID__]?.enabled ?? true,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         version: __MODULE_VERSION__ as any,
         nameplates: this.nameplates.map(nameplate => nameplate.serialize())
       };
-      await this.token.actor.prototypeToken.update({
+      await this.token.actor.update({
         flags: {
           [__MODULE_ID__]: flags
         }
@@ -81,14 +81,14 @@ export class NameplateToken {
   }
 
   public async save() {
-    if (this.token.document && game.user instanceof User && this.token.document.canUserModify(game.user, "update")) {
+    if (this.token.actor && game.user instanceof User && this.token.actor.canUserModify(game.user, "update")) {
       const flags: NameplateConfiguration = {
-        enabled: this.token.document.flags[__MODULE_ID__]?.enabled ?? true,
+        enabled: this.token.actor.flags[__MODULE_ID__]?.enabled ?? true,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         version: __MODULE_VERSION__ as any,
         nameplates: this.nameplates.map(nameplate => nameplate.serialize())
       };
-      await this.token.document.update({
+      await this.token.actor.update({
         flags: {
           [__MODULE_ID__]: flags
         }
@@ -169,10 +169,10 @@ export class NameplateToken {
       nameplate.text = "{name}";
     }
 
-    if (token.document?.flags[__MODULE_ID__]) {
+    if (token.actor?.flags[__MODULE_ID__]) {
       // Process flags
-      const nameplates = token.document.getFlag(__MODULE_ID__, "nameplates");
-      this.setNameplates(nameplates);
+      const nameplates = token.actor.getFlag(__MODULE_ID__, "nameplates");
+      if (Array.isArray(nameplates)) this.setNameplates(nameplates);
     }
   }
 }

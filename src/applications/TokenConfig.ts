@@ -138,8 +138,6 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
     async _prepareContext(options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       const context = await super._prepareContext(options);
 
-      console.log("Config:", this);
-
       if (!this.#flags) {
         this.#flags = foundry.utils.mergeObject({
           enabled: true,
