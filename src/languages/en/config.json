@@ -1,0 +1,35 @@
+{
+  "NAMEPLATES": {
+    "CONFIG": {
+      "CURRENT": {
+        "HINT": "The current value after interpolation",
+        "LABEL": "Current Value"
+      },
+      "ENABLE": {
+        "HINT": "Toggle on to enable Token Nameplates for this token.",
+        "LABEL": "Enable Nameplates"
+      },
+      "HEADER": "Nameplates",
+      "REMOVE": {
+        "CONTENT": "Are you sure you want to remove this nameplate?\nThis cannot be undone.",
+        "TITLE": "Remove Nameplate"
+      },
+      "TOOLTIPS": {
+        "DOWN": "Move nameplate down",
+        "EDIT": "Edit nameplate",
+        "REMOVE": "Remove nameplate",
+        "UP": "Move nameplate up",
+        "ADD": "Add nameplate"
+      },
+      "VALUE": {
+        "HINT": "",
+        "LABEL": "Value"
+      }
+    }
+  },
+  "TOKEN": {
+    "TABS": {
+      "nameplates": "Nameplates"
+    }
+  }
+}

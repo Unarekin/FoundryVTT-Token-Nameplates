@@ -1,6 +1,6 @@
 import { NameplatePosition } from "./types";
 import { Nameplate as NameplateConfig } from "./types";
-import { interpolate, getInterpolationData } from "./functions";
+import { interpolate, getInterpolationData, serializeStyle } from "./functions";
 
 export class Nameplate {
   #position: NameplatePosition = "bottom";
@@ -29,14 +29,7 @@ export class Nameplate {
   }
 
   public serializeStyle(): Record<string, unknown> {
-    const style = JSON.parse(JSON.stringify(this.style)) as Record<string, unknown>;
-    for (const key in style) {
-      if (key.startsWith("_")) {
-        style[key.substring(1)] = style[key];
-        delete style[key];
-      }
-    }
-    return style;
+    return serializeStyle(this.style as PIXI.TextStyle);
   }
 
   public serialize(): NameplateConfig {

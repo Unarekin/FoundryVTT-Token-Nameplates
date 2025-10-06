@@ -32,9 +32,7 @@ export class NameplateToken {
     this.refreshPosition();
   }
 
-  public draw() {
-    console.log("Draw:", this);
-  }
+  public draw() { /* Empty */ }
 
   public addText(text: string | foundry.canvas.containers.PreciseText, position?: NameplatePosition): Nameplate {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

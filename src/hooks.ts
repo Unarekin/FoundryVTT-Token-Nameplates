@@ -1,6 +1,6 @@
 import { DeepPartial, PropsOfType } from "types";
 import { NameplateToken } from "./NameplateToken";
-
+import { TokenConfigMixin } from "./applications";
 
 Hooks.once("canvasReady", () => {
   // Initialize Pixi DevTools if we are a debug build
@@ -77,4 +77,11 @@ Hooks.once("init", () => {
 (Hooks as any).on("updateActor", (actor: Actor, delta: DeepPartial<Actor>) => {
   const nameplate = TokenNameplates.tokens.find(nameplate => nameplate.token.actor === actor);
   if (nameplate instanceof NameplateToken) nameplate.actorUpdated(delta);
+})
+
+Hooks.once("ready", () => {
+  // Apply token configuration mixin.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  const mixed = TokenConfigMixin(CONFIG.Token.sheetClasses.base["core.TokenConfig"].cls as any);
+  CONFIG.Token.sheetClasses.base["core.TokenConfig"].cls = mixed;
 })

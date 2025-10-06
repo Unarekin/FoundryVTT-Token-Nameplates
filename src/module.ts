@@ -1,6 +1,6 @@
 import "./hooks";
 import "./settings";
-
+import "./helpers";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (globalThis as any).TokenNameplates = {

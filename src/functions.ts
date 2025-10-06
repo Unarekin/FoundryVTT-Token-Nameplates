@@ -29,3 +29,23 @@ export function getInterpolationData(doc: TokenDocument): Record<string, unknown
     })
   ) as Record<string, unknown>
 }
+
+
+export async function confirm(title: string, content: string): Promise<boolean> {
+  return foundry.applications.api.DialogV2.confirm({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    window: ({ title } as any),
+    content
+  }) as Promise<boolean>;
+}
+
+export function serializeStyle(style: PIXI.TextStyle) {
+  const serialized = JSON.parse(JSON.stringify(style)) as Record<string, unknown>;
+  for (const key in style) {
+    if (key.startsWith("_")) {
+      serialized[key.substring(1)] = serialized[key];
+      delete serialized[key];
+    }
+  }
+  return serialized;
+}

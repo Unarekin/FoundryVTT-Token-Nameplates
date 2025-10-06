@@ -1,0 +1,20 @@
+.token-nameplate-list {
+  display: grid;
+  grid-template-columns: fit-content(50px) 1fr 1fr fit-content(50px);
+
+  &__header {
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  &__col {
+    padding: 4px;
+    &--alt-row {
+      background-color: var(--table-row-color-even);
+    }
+    &--disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+}
