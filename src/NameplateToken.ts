@@ -115,7 +115,8 @@ export class NameplateToken {
     let bottomY = this.token.document.height * (canvas?.scene?.dimensions.size ?? 100);
     let topY = 0;
 
-    for (const nameplate of this.nameplates) {
+    const nameplates = this.nameplates.filter(nameplate => nameplate.enabled);
+    for (const nameplate of nameplates) {
       if (nameplate.position === "bottom") {
         nameplate.y = bottomY;
         bottomY += nameplate.height + nameplate.padding.y;

@@ -6,6 +6,8 @@ export class Nameplate {
   #position: NameplatePosition = "bottom";
   #id = foundry.utils.randomID();
 
+  public enabled = true;
+
   #text = "";
 
   public get id() { return this.#id; }

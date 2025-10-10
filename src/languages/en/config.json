@@ -1,6 +1,14 @@
 {
   "NAMEPLATES": {
     "CONFIG": {
+      "ALPHA": {
+        "HINT": "Opacity of the nameplate",
+        "LABEL": "Opacity"
+      },
+      "ANGLE": {
+        "HINT": "Angle at which to display this namplate.",
+        "LABEL": "Angle"
+      },
       "CURRENT": {
         "HINT": "The current value after interpolation",
         "LABEL": "Current Value"
@@ -9,20 +17,41 @@
         "HINT": "Toggle on to enable Token Nameplates for this token.",
         "LABEL": "Enable Nameplates"
       },
+      "PLATEENABLED": {
+        "LABEL": "Enabled",
+        "HINT": "Toggle on to display this nameplate."
+      },
       "HEADER": "Nameplates",
+      "PADDING": {
+        "HINT": "Space above and to the left of the nameplate",
+        "LABEL": "Padding",
+        "X": "Left",
+        "Y": "Top"
+      },
+      "POSITION": {
+        "BOTTOM": "Bottom",
+        "HINT": "Where to place the nameplate relative to the token",
+        "LABEL": "Position",
+        "TOP": "Top"
+      },
       "REMOVE": {
         "CONTENT": "Are you sure you want to remove this nameplate?\nThis cannot be undone.",
         "TITLE": "Remove Nameplate"
       },
+      "TABS": {
+        "BASICS": "Basics",
+        "FONT": "Font"
+      },
+      "TITLE": "Configure Nameplate",
       "TOOLTIPS": {
+        "ADD": "Add nameplate",
         "DOWN": "Move nameplate down",
         "EDIT": "Edit nameplate",
         "REMOVE": "Remove nameplate",
-        "UP": "Move nameplate up",
-        "ADD": "Add nameplate"
+        "UP": "Move nameplate up"
       },
       "VALUE": {
-        "HINT": "",
+        "HINT": "The value of the label.  See <a href='https://github.com/Unarekin/FoundryVTT-Token-Nameplates/wiki/Interpolation'>the wiki</a> for information about string interpolation.",
         "LABEL": "Value"
       }
     }

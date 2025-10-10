@@ -37,6 +37,7 @@ export type PropsOfType<P, O> = Record<PropsCoercedToPOrNeverOnO<P, O>, O>;
 
 export interface Nameplate {
   id: string;
+  enabled: boolean;
   sort: number;
   position: NameplatePosition;
   style: Record<string, unknown>;

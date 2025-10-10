@@ -1,9 +1,13 @@
-import { Nameplate } from "../types";
+import { Nameplate, NameplatePosition } from "../types";
 
 export interface NameplateConfigContext extends foundry.applications.api.ApplicationV2.RenderContext {
+  tabs?: Record<string, foundry.applications.api.ApplicationV2.Tab>;
+  buttons: foundry.applications.api.ApplicationV2.FormFooterButton[];
+  idPrefix: string;
   object: TokenDocument | Actor;
   nameplate: Nameplate;
   fontSelect: Record<string, string>;
+  positionSelect: Record<NameplatePosition, string>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
