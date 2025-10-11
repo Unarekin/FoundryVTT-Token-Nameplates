@@ -35,8 +35,9 @@ export interface TokenNameplates {
 type PropsCoercedToPOrNeverOnO<O, P> = { [k in keyof O]: O[k] extends P ? k : never }[keyof O];
 export type PropsOfType<P, O> = Record<PropsCoercedToPOrNeverOnO<P, O>, O>;
 
-export interface Nameplate {
+export interface SerializedNameplate {
   id: string;
+  enabled: boolean;
   sort: number;
   position: NameplatePosition;
   style: Record<string, unknown>;
@@ -49,5 +50,5 @@ export interface Nameplate {
 export interface NameplateConfiguration {
   enabled: boolean;
   version: Version;
-  nameplates: Nameplate[];
+  nameplates: SerializedNameplate[];
 }

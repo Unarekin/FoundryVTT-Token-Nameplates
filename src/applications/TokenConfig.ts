@@ -73,6 +73,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
         const nameplate = await NameplateConfigApplication.Edit({
           ...foundry.utils.deepClone(DefaultNameplate),
+          id: foundry.utils.randomID(),
           style: serializeStyle(CONFIG.canvasTextStyle.clone()),
           sort: highest + 1
         });

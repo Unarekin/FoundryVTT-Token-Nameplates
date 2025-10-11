@@ -1,5 +1,6 @@
-import { DeepPartial, NameplatePosition, Nameplate as NameplateItem, NameplateConfiguration } from "types";
+import { DeepPartial, NameplatePosition, SerializedNameplate, NameplateConfiguration } from "types";
 import { Nameplate } from "./Nameplate";
+import { DefaultNameplate } from "settings";
 
 /**
  * Manages the nameplates for a given token
@@ -18,6 +19,8 @@ export class NameplateToken {
       // Process flags
       const nameplates = this.token.actor.getFlag(__MODULE_ID__, "nameplates");
       this.setNameplates(nameplates);
+    } else {
+      this.setNameplates([]);
     }
   }
 
@@ -54,6 +57,7 @@ export class NameplateToken {
     this.token.addChild(nameplate.object);
 
     this.refreshPosition();
+    this.save().catch(console.error);
     return nameplate;
   }
 
@@ -62,22 +66,6 @@ export class NameplateToken {
     this.token.addChild(nameplate.object);
     this.refreshPosition();
     return nameplate;
-  }
-
-  public async saveToPrototype() {
-    if (this.token.actor?.prototypeToken && game.user instanceof User && this.token.actor.canUserModify(game.user, "update")) {
-      const flags: NameplateConfiguration = {
-        enabled: this.token.actor.flags[__MODULE_ID__]?.enabled ?? true,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        version: __MODULE_VERSION__ as any,
-        nameplates: this.nameplates.map(nameplate => nameplate.serialize())
-      };
-      await this.token.actor.update({
-        flags: {
-          [__MODULE_ID__]: flags
-        }
-      });
-    }
   }
 
   public async save() {
@@ -96,7 +84,16 @@ export class NameplateToken {
     }
   }
 
-  public setNameplates(nameplates: NameplateItem[]) {
+  public setNameplates(nameplates: SerializedNameplate[]) {
+    if (!nameplates.length) {
+      nameplates.push(foundry.utils.mergeObject(
+        foundry.utils.deepClone(DefaultNameplate),
+        this.token.nameplate ?
+          {
+            style: this.token.nameplate.style.clone()
+          } : {}
+      ) as SerializedNameplate)
+    }
     for (let i = 0; i < nameplates.length; i++) {
       const config = nameplates[i];
       const nameplate = this.nameplates[i] ?? this.addText(config.value);
@@ -107,6 +104,7 @@ export class NameplateToken {
       const removed = this.nameplates.splice(nameplates.length, this.nameplates.length - nameplates.length);
       removed.forEach(item => { item.destroy(); });
     }
+
   }
 
   public refreshPosition() {
@@ -115,7 +113,12 @@ export class NameplateToken {
     let bottomY = this.token.document.height * (canvas?.scene?.dimensions.size ?? 100);
     let topY = 0;
 
-    for (const nameplate of this.nameplates) {
+    const nameplates = this.nameplates;
+    for (const nameplate of nameplates) {
+      if (!nameplate.enabled) {
+        nameplate.object.visible = false;
+        continue;
+      }
       if (nameplate.position === "bottom") {
         nameplate.y = bottomY;
         bottomY += nameplate.height + nameplate.padding.y;
@@ -149,6 +152,9 @@ export class NameplateToken {
 
   public destroy() {
     this.nameplates.forEach(nameplate => { nameplate.destroy(); });
+
+    const index = TokenNameplates.tokens.indexOf(this);
+    if (index > -1) TokenNameplates.tokens.splice(index, 1);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -164,15 +170,13 @@ export class NameplateToken {
 
 
   constructor(public readonly token: foundry.canvas.placeables.Token) {
-    if (token.nameplate) {
-      const nameplate = this.addText(token.nameplate);
-      nameplate.text = "{name}";
-    }
-
-    if (token.actor?.flags[__MODULE_ID__]) {
-      // Process flags
-      const nameplates = token.actor.getFlag(__MODULE_ID__, "nameplates");
-      if (Array.isArray(nameplates)) this.setNameplates(nameplates);
+    const nameplates = token.actor?.flags[__MODULE_ID__]?.nameplates;
+    if (Array.isArray(nameplates) && nameplates.length) {
+      this.setNameplates(nameplates);
+    } else if (token.nameplate) {
+      token.nameplate.renderable = false;
+      const nameplate = this.addText("{name}");
+      nameplate.style = token.nameplate.style.clone();
     }
   }
 }
