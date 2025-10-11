@@ -1,5 +1,5 @@
 import { NameplatePosition } from "./types";
-import { Nameplate as NameplateConfig } from "./types";
+import { SerializedNameplate } from "./types";
 import { interpolate, getInterpolationData, serializeStyle } from "./functions";
 
 export class Nameplate {
@@ -12,11 +12,12 @@ export class Nameplate {
 
   public get id() { return this.#id; }
 
-  public static deserialize(token: foundry.canvas.placeables.Token, config: NameplateConfig): Nameplate {
+  public static deserialize(token: foundry.canvas.placeables.Token, config: SerializedNameplate): Nameplate {
     return new Nameplate(token, config.value).deserialize(config);
   }
 
-  public deserialize(config: NameplateConfig): this {
+  public deserialize(config: SerializedNameplate): this {
+    this.enabled = config.enabled;
     this.#id = config.id ?? foundry.utils.randomID();
     this.text = config.value ?? "";
     this.position = config.position ?? "bottom";
@@ -34,8 +35,9 @@ export class Nameplate {
     return serializeStyle(this.style as PIXI.TextStyle);
   }
 
-  public serialize(): NameplateConfig {
+  public serialize(): SerializedNameplate {
     return {
+      enabled: this.enabled,
       id: this.id,
       position: this.position,
       sort: this.sort,
@@ -108,7 +110,7 @@ export class Nameplate {
   public set alpha(val) { this.object.alpha = val; }
 
   public destroy() {
-    if (!this.object.destroyed) this.object.destroy();
+    if (!this.object.destroyed && this.token.nameplate !== this.object) this.object.destroy();
   }
 
 

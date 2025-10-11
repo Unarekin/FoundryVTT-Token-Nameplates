@@ -17,9 +17,31 @@
         "HINT": "Toggle on to enable Token Nameplates for this token.",
         "LABEL": "Enable Nameplates"
       },
-      "PLATEENABLED": {
-        "LABEL": "Enabled",
-        "HINT": "Toggle on to display this nameplate."
+      "FONT": {
+        "COLOR": {
+          "HINT": "",
+          "LABEL": "Color"
+        },
+        "DROPSHADOW": {
+          "HINT": "",
+          "LABEL": "Drop Shadow"
+        },
+        "DROPSHADOWALPHA": {
+          "HINT": "Opacity of the drop shadow, if any",
+          "LABEL": "Drop Shadow Alpha"
+        },
+        "DROPSHADOWCOLOR": {
+          "HINT": "The color of the drop shadow, if any",
+          "LABEL": "Drop Shadow Color"
+        },
+        "FAMILY": {
+          "HINT": "The font for this nameplate.",
+          "LABEL": "Font"
+        },
+        "SIZE": {
+          "HINT": "",
+          "LABEL": "Size"
+        }
       },
       "HEADER": "Nameplates",
       "PADDING": {
@@ -27,6 +49,10 @@
         "LABEL": "Padding",
         "X": "Left",
         "Y": "Top"
+      },
+      "PLATEENABLED": {
+        "HINT": "Toggle on to display this nameplate.",
+        "LABEL": "Enabled"
       },
       "POSITION": {
         "BOTTOM": "Bottom",
