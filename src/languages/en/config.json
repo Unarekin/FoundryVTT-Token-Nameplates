@@ -13,6 +13,10 @@
         "HINT": "The current value after interpolation",
         "LABEL": "Current Value"
       },
+      "DISPLAY": {
+        "HINT": "",
+        "LABEL": "Display Nameplate"
+      },
       "ENABLE": {
         "HINT": "Toggle on to enable Token Nameplates for this token.",
         "LABEL": "Enable Nameplates"
@@ -44,15 +48,12 @@
         }
       },
       "HEADER": "Nameplates",
+      "LOWER": "Lower Nameplates",
       "PADDING": {
         "HINT": "Space above and to the left of the nameplate",
         "LABEL": "Padding",
         "X": "Left",
         "Y": "Top"
-      },
-      "DISPLAY": {
-        "LABEL": "Display Nameplate",
-        "HINT": ""
       },
       "POSITION": {
         "BOTTOM": "Bottom",
@@ -76,6 +77,7 @@
         "REMOVE": "Remove nameplate",
         "UP": "Move nameplate up"
       },
+      "UPPER": "Upper Nameplates",
       "VALUE": {
         "HINT": "The value of the label.<br>See <a href='https://github.com/Unarekin/FoundryVTT-Token-Nameplates/wiki/Interpolation'>the wiki</a> for information about string interpolation.",
         "LABEL": "Value"

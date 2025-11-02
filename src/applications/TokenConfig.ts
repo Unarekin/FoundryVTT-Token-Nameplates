@@ -194,11 +194,16 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (context as any).nameplates = {
         enabled: this.#flags?.enabled ?? true,
-        nameplates: (this.#flags?.nameplates ?? [])?.map(nameplate => ({
+        upperNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "top").map(nameplate => ({
           ...nameplate,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
           actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
-        })) ?? [],
+        })),
+        lowerNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "bottom").map(nameplate => ({
+          ...nameplate,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+          actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
+        })),
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         idPrefix: (this as any).token instanceof foundry.canvas.placeables.Token ? (this as any).token.uuid.replaceAll(".", "-") : `prototype-${(this as any).actor.uuid.replaceAll(".", "-")}`,
         // idPrefix: (this as any).token.uuid.replaceAll(".", "-"),
