@@ -16,16 +16,12 @@
   </div>
 
   <div class="form-group">
-    <label for="{{idPrefix}}-enabled">{{localize
-        "NAMEPLATES.CONFIG.PLATEENABLED.LABEL"
-      }}</label>
-    <input
-      type="checkbox"
-      name="enabled"
-      id="{{idPrefix}}-enabled"
-      {{checked nameplate.enabled}}
-    />
-    <p class="hint">{{localize "NAMEPLATES.CONFIG.PLATEENABLED.HINT"}}</p>
+    <label for="{{idPrefix}}-display">{{localize "NAMEPLATES.CONFIG.DISPLAY.LABEL"}}</label>
+    <select name="display" id="{{idPrefix}}-display">
+      {{selectOptions displaySelect selected=nameplate.display localize=true}}
+    </select>
+
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.DISPLAY.HINT"}}</p>
   </div>
 
   <div class="form-group">

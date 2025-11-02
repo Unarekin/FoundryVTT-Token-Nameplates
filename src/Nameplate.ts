@@ -1,4 +1,4 @@
-import { NameplatePosition } from "./types";
+import { NameplateDisplay, NameplatePosition } from "./types";
 import { SerializedNameplate } from "./types";
 import { interpolate, getInterpolationData, serializeStyle } from "./functions";
 
@@ -30,7 +30,7 @@ export class Nameplate {
     this.angle = config.angle ?? 0;
     this.alpha = config.alpha ?? 1;
     if (config.style) this.style = config.style;
-    this.alwaysVisible = config.alwaysVisible ?? false;
+    this.display = config.display ?? "default";
 
     return this;
   }
@@ -48,7 +48,7 @@ export class Nameplate {
       value: this.text,
       angle: this.angle,
       alpha: this.alpha,
-      alwaysVisible: this.alwaysVisible,
+      display: this.display,
       padding: {
         x: this.padding.x,
         y: this.padding.y
@@ -109,6 +109,8 @@ export class Nameplate {
 
   public get alpha() { return this.object.alpha; }
   public set alpha(val) { this.object.alpha = val; }
+
+  public display: NameplateDisplay = "default";
 
   public destroy() {
     if (!this.object.destroyed && this.token.nameplate !== this.object) this.object.destroy();

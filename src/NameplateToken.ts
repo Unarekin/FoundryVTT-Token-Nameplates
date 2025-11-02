@@ -1,7 +1,16 @@
-import { DeepPartial, NameplateConfiguration } from "types";
+import { DeepPartial, NameplateConfiguration, NameplateDisplay } from "types";
 import { Nameplate } from "./Nameplate";
 import { DefaultSettings } from "settings";
 import { serializeStyle } from "functions";
+
+const TokenDisplayHash: Record<number, NameplateDisplay> = {
+  50: "always",
+  10: "control",
+  30: "hover",
+  0: "none",
+  40: "owner",
+  20: "ownerHover"
+}
 
 export class NameplateToken {
   #destroyed = false;
@@ -29,6 +38,31 @@ export class NameplateToken {
     }
   }
 
+  protected shouldDisplay(nameplate: Nameplate): boolean {
+    if (!this.token) return false;
+    const display = nameplate.display === "default" ? TokenDisplayHash[this.token.displayName] : nameplate.display;
+
+    // Special case: Don't display a tooltip element if there's no tooltip (elevation is 0)
+    if (nameplate.text === "{tooltip}" && this.token.object?.tooltip?.text === "") return false;
+
+    switch (display) {
+      case "always":
+        return true;
+      case "none":
+        return true;
+      case "owner":
+        return this.token.isOwner;
+      case "control":
+        return (this.token.object && canvas?.tokens?.controlled.includes(this.token.object)) ?? false;
+      case "ownerHover":
+        return (this.token.object?.hover ?? false) && this.token.isOwner;
+      case "hover":
+        return (this.token.object?.hover ?? false)
+      default:
+        return false;
+    }
+  }
+
   protected refreshNameplates() {
     if (!this.token?.object) return;
     const { width } = this.token.object.bounds;
@@ -36,7 +70,7 @@ export class NameplateToken {
     const bottom = this.bottomNameplates.sort((a, b) => a.sort - b.sort);
     let y = this.token.object.nameplate?.y ?? 0;
     for (const plate of bottom) {
-      if (this.token.object.nameplate?.visible) {
+      if (this.shouldDisplay(plate)) {
         plate.object.visible = true;
         plate.refreshText();
         plate.style.wordWrapWidth = width * 2.5;
@@ -53,7 +87,8 @@ export class NameplateToken {
     const top = this.topNameplates.sort((a, b) => a.sort - b.sort);
     y = (this.token.object.tooltip?.y ?? 0);
     for (const plate of top) {
-      if (this.token.object.tooltip?.visible && !(plate.text === "{tooltip}" && this.token.object.tooltip?.text === "")) {
+      // if (this.token.object.tooltip?.visible && !(plate.text === "{tooltip}" && this.token.object.tooltip?.text === "")) {
+      if (this.shouldDisplay(plate)) {
         plate.object.visible = true;
         plate.refreshText();
         y -= (plate.height + 2 + plate.padding.y);

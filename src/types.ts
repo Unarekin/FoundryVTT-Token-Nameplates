@@ -35,6 +35,9 @@ export interface TokenNameplates {
 type PropsCoercedToPOrNeverOnO<O, P> = { [k in keyof O]: O[k] extends P ? k : never }[keyof O];
 export type PropsOfType<P, O> = Record<PropsCoercedToPOrNeverOnO<P, O>, O>;
 
+export const NameplateDisplayOptions = ["default", "none", "control", "ownerHover", "hover", "owner", "always"] as const;
+export type NameplateDisplay = typeof NameplateDisplayOptions[number];
+
 export interface SerializedNameplate {
   id: string;
   enabled: boolean;
@@ -45,7 +48,7 @@ export interface SerializedNameplate {
   padding: { x: number; y: number };
   angle: number;
   alpha: number;
-  alwaysVisible: boolean;
+  display: NameplateDisplay;
 }
 
 export interface NameplateConfiguration {

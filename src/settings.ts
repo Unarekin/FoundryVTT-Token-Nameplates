@@ -25,8 +25,9 @@ export const DefaultNameplate: SerializedNameplate = {
   enabled: true,
   sort: 0,
   position: "bottom",
-  alwaysVisible: false,
+  display: "default",
   value: "",
+
   padding: { x: 0, y: 0 },
   angle: 0,
   alpha: 1,

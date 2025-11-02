@@ -1,6 +1,6 @@
 import { NameplateConfigContext, NameplateConfigConfiguration } from "./types";
 import { DeepPartial, SerializedNameplate } from "../types";
-import { generateFontSelectOptions } from "./functions";
+import { generateDisplaySelectOptions, generateFontSelectOptions } from "./functions";
 
 export class NameplateConfigApplication extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2<NameplateConfigContext, NameplateConfigConfiguration>) {
 
@@ -179,6 +179,7 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     }
 
     context.fontSelect = generateFontSelectOptions();
+    context.displaySelect = generateDisplaySelectOptions();
 
     context.buttons = [
       { type: "button", icon: "fa-solid fa-times", label: "Cancel", action: "cancel" },
