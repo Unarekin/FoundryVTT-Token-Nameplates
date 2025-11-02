@@ -1,9 +1,9 @@
-import { getInterpolationData, interpolate, confirm, serializeStyle } from "functions";
+import { getInterpolationData, interpolate, confirm, serializeStyle, getDefaultNameplate } from "functions";
 import { DeepPartial, NameplateConfiguration } from "../types";
 import { generateFontSelectOptions } from "./functions";
 import { LocalizedError } from "../errors";
 import { NameplateConfigApplication } from "./NameplateConfig";
-import { DefaultNameplate, DefaultSettings } from "settings";
+import { DefaultSettings } from "settings";
 
 
 export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenConfig) {
@@ -72,7 +72,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         const highest = this.#flags.nameplates.reduce((prev, curr) => curr.position === "bottom" && curr.sort > prev ? curr.sort : prev, 0);
 
         const nameplate = await NameplateConfigApplication.Edit({
-          ...foundry.utils.deepClone(DefaultNameplate),
+          ...getDefaultNameplate(),
           id: foundry.utils.randomID(),
           style: serializeStyle(CONFIG.canvasTextStyle.clone()),
           sort: highest + 1
@@ -121,7 +121,9 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         if (!nameplate) throw new LocalizedError("NAMEPLATENOTFOUND");
 
         const edited = await NameplateConfigApplication.Edit(nameplate);
+
         if (edited) {
+          edited.style = serializeStyle(edited.style as unknown as PIXI.TextStyle);
           const index = this.#flags.nameplates.findIndex(item => item.id === edited.id);
           if (index > -1) this.#flags.nameplates.splice(index, 1, edited);
           await this.render();
@@ -147,15 +149,16 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const actor = ((this as any).token as foundry.canvas.placeables.Token).actor as Actor | undefined;
-
       actor?.update({
         flags: {
           [__MODULE_ID__]: config
         }
-      }).catch((err: Error) => {
-        console.error(err);
-        ui.notifications?.error(err.message, { console: false });
       })
+
+        .catch((err: Error) => {
+          console.error(err);
+          ui.notifications?.error(err.message, { console: false });
+        })
 
       return super._onSubmitForm(formConfig, event);
     }
@@ -169,13 +172,18 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
           version: __MODULE_VERSION__,
           nameplates: []
         },
-          {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            ...((this as any).actor.flags[__MODULE_ID__] ?? {}),
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            ...((this as any).token.flags[__MODULE_ID__] ?? {})
-          }
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          ((this as any).actor.flags[__MODULE_ID__] ?? {}),
         ) as NameplateConfiguration;
+
+        if (!this.#flags.nameplates?.length) {
+          // Add placeholder
+          this.#flags.nameplates.push({
+            ...getDefaultNameplate(),
+            id: foundry.utils.randomID(),
+            value: "{name}"
+          });
+        }
       }
 
 
@@ -195,18 +203,6 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
       return context;
     }
-
-    // async _onRender(context: foundry.applications.api.DocumentSheetV2.RenderContext<any>, options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
-    //   await super._onRender(context, options);
-
-    //   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    //   ($(this.element).find(`[data-role="nameplate-item"]`) as any).sortable({
-    //     handle: `[data-role="drag-handle"]`,
-    //     containment: "parent",
-    //     axis: "y"
-    //   })
-    // }
-
   }
 
   // Inject our configuration part before the footer

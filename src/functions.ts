@@ -1,3 +1,6 @@
+import { DefaultNameplate } from "settings";
+import { SerializedNameplate } from "types";
+
 /** Strips HTML from a given string */
 export function stripHTML(val: string): string {
   const doc = new DOMParser().parseFromString(val, "text/html");
@@ -48,4 +51,11 @@ export function serializeStyle(style: PIXI.TextStyle) {
     }
   }
   return serialized;
+}
+
+export function getDefaultNameplate(): SerializedNameplate {
+  const val = foundry.utils.deepClone(DefaultNameplate);
+  val.style = serializeStyle(CONFIG.canvasTextStyle);
+
+  return val;
 }

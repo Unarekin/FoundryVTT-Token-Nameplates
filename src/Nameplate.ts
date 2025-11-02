@@ -8,6 +8,8 @@ export class Nameplate {
 
   public enabled = true;
 
+  public alwaysVisible = false;
+
   #text = "";
 
   public get id() { return this.#id; }
@@ -23,10 +25,12 @@ export class Nameplate {
     this.position = config.position ?? "bottom";
     this.padding.x = config.padding?.x ?? 0;
     this.padding.y = config.padding?.y ?? 0;
-    this.sort = config.sort ?? 0;
+    this.sort = typeof config.sort === "number" ? config.sort : typeof config.sort === "string" ? parseInt(config.sort) : 0;
+    if (isNaN(this.sort)) this.sort = 0;
     this.angle = config.angle ?? 0;
     this.alpha = config.alpha ?? 1;
     if (config.style) this.style = config.style;
+    this.alwaysVisible = config.alwaysVisible ?? false;
 
     return this;
   }
@@ -44,6 +48,7 @@ export class Nameplate {
       value: this.text,
       angle: this.angle,
       alpha: this.alpha,
+      alwaysVisible: this.alwaysVisible,
       padding: {
         x: this.padding.x,
         y: this.padding.y

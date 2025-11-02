@@ -13,10 +13,10 @@ Hooks.once("canvasReady", () => {
   }
 });
 
-function upsertNameplate(token: foundry.canvas.placeables.Token): NameplateToken {
-  const index = TokenNameplates.tokens.findIndex(item => item.token === token);
+function upsertNameplate(document: TokenDocument): NameplateToken {
+  const index = TokenNameplates.tokens.findIndex(item => item.token === document);
   if (index > -1) return TokenNameplates.tokens[index];
-  const nameplate = new NameplateToken(token);
+  const nameplate = new NameplateToken(document);
   TokenNameplates.tokens.push(nameplate);
   return nameplate;
 }
@@ -30,7 +30,7 @@ function simpleWrapper<t extends keyof PropsOfType<NameplateToken, Function>>(fu
     if (retVal instanceof Promise) {
       return retVal
         .then(val => {
-          const nameplateToken = upsertNameplate(this);
+          const nameplateToken = upsertNameplate(this.document);
 
           if (nameplateToken) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -40,7 +40,7 @@ function simpleWrapper<t extends keyof PropsOfType<NameplateToken, Function>>(fu
           return val;
         })
     } else {
-      const nameplateToken = upsertNameplate(this);
+      const nameplateToken = upsertNameplate(this.document);
       if (nameplateToken) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (nameplateToken as any)[funcName]();
@@ -69,13 +69,13 @@ Hooks.once("init", () => {
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 (Hooks as any).on("updateToken", (doc: TokenDocument, delta: DeepPartial<TokenDocument>) => {
-  const nameplate = doc.object ? TokenNameplates.tokens.find(nameplate => nameplate.token === doc.object) : undefined;
+  const nameplate = doc.object ? TokenNameplates.tokens.find(nameplate => nameplate.token === doc) : undefined;
   if (nameplate instanceof NameplateToken) nameplate.tokenUpdated(delta);
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 (Hooks as any).on("updateActor", (actor: Actor, delta: DeepPartial<Actor>) => {
-  const nameplate = TokenNameplates.tokens.find(nameplate => nameplate.token.actor === actor);
+  const nameplate = TokenNameplates.tokens.find(nameplate => nameplate.actor === actor);
   if (nameplate instanceof NameplateToken) nameplate.actorUpdated(delta);
 })
 

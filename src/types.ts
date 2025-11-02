@@ -45,6 +45,7 @@ export interface SerializedNameplate {
   padding: { x: number; y: number };
   angle: number;
   alpha: number;
+  alwaysVisible: boolean;
 }
 
 export interface NameplateConfiguration {

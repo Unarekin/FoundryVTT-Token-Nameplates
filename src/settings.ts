@@ -25,11 +25,13 @@ export const DefaultNameplate: SerializedNameplate = {
   enabled: true,
   sort: 0,
   position: "bottom",
+  alwaysVisible: false,
   value: "",
   padding: { x: 0, y: 0 },
   angle: 0,
   alpha: 1,
-  style: CONFIG.canvasTextStyle as unknown as Record<string, unknown>
+  // style: CONFIG.canvasTextStyle as unknown as Record<string, unknown>
+  style: {}
   // style: {
   //   align: "left",
   //   breakWords: false,

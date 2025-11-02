@@ -1,182 +1,150 @@
-import { DeepPartial, NameplatePosition, SerializedNameplate, NameplateConfiguration } from "types";
+import { DeepPartial, NameplateConfiguration } from "types";
 import { Nameplate } from "./Nameplate";
-import { DefaultNameplate } from "settings";
+import { DefaultSettings } from "settings";
 
-/**
- * Manages the nameplates for a given token
- */
 export class NameplateToken {
+  #destroyed = false;
+  #enabled = true;
+
+  public readonly token: TokenDocument | undefined;
+  public readonly actor: Actor | undefined;
+
+  private bottomContainer = new PIXI.Container();
+  private topContainer = new PIXI.Container();
 
   public readonly nameplates: Nameplate[] = [];
 
   public get bottomNameplates() { return this.nameplates.filter(nameplate => nameplate.position === "bottom"); }
   public get topNameplates() { return this.nameplates.filter(nameplate => nameplate.position === "top"); }
+  public get destroyed() { return this.#destroyed; }
 
-  public refreshSize() { /* empty */ }
-
-  public refreshNameplate() {
-    if (this.token.actor?.flags[__MODULE_ID__]) {
-      // Process flags
-      const nameplates = this.token.actor.getFlag(__MODULE_ID__, "nameplates");
-      this.setNameplates(nameplates);
-    } else {
-      this.setNameplates([]);
+  public get enabled() { return this.#enabled; }
+  public set enabled(val) {
+    if (val !== this.enabled) {
+      this.#enabled = val;
+      const enabled = this.actor?.flags[__MODULE_ID__]?.enabled;
+      if (typeof enabled === "boolean" && val !== enabled)
+        this.actor?.setFlag(__MODULE_ID__, "enabled", val).catch(console.error);
     }
   }
 
-  public refreshTooltip() {
-    this.refreshNameplate();
-  }
 
-  public refreshState() {
-    this.refreshNameplate();
-    this.bottomNameplates.forEach(nameplate => { nameplate.visible = !!this.token.nameplate?.visible });
-    this.topNameplates.forEach(nameplate => { nameplate.visible = !!this.token.tooltip?.visible; });
-    this.refreshPosition();
-  }
+  protected refreshNameplates() {
+    if (!this.token?.object) return;
+    const { width } = this.token.object.bounds;
 
-  public draw() { /* Empty */ }
-
-  public addText(text: string | foundry.canvas.containers.PreciseText, position?: NameplatePosition): Nameplate {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const nameplate = new Nameplate(this.token, text as any);
-    if (position) nameplate.position = position;
-    if (typeof text === "string") {
-      const style = this.token.nameplate?.style.clone();
-      if (style) {
-        nameplate.style = style;
+    const bottom = this.bottomNameplates.sort((a, b) => a.sort - b.sort);
+    let y = this.token.object.nameplate?.y ?? 0;
+    for (const plate of bottom) {
+      if (plate.alwaysVisible || this.token.object.nameplate?.visible) {
+        plate.object.visible = true;
+        plate.y = y;
+        plate.x = (width - plate.width) / 2;
+        y += plate.height + 2;
       } else {
-        nameplate.style = CONFIG.canvasTextStyle.clone();
-        nameplate.style.fontSize = 24;
-        nameplate.style.wordWrapWidth = this.token.width * 2.5;
-        nameplate.style.wordWrap = true;
+        plate.object.visible = false;
       }
     }
 
-    this.nameplates.push(nameplate);
-    this.token.addChild(nameplate.object);
 
-    this.refreshPosition();
-    this.save().catch(console.error);
-    return nameplate;
-  }
-
-  public addNameplate(nameplate: Nameplate): Nameplate {
-    if (!this.nameplates.includes(nameplate)) this.nameplates.push(nameplate);
-    this.token.addChild(nameplate.object);
-    this.refreshPosition();
-    return nameplate;
-  }
-
-  public async save() {
-    if (this.token.actor && game.user instanceof User && this.token.actor.canUserModify(game.user, "update")) {
-      const flags: NameplateConfiguration = {
-        enabled: this.token.actor.flags[__MODULE_ID__]?.enabled ?? true,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        version: __MODULE_VERSION__ as any,
-        nameplates: this.nameplates.map(nameplate => nameplate.serialize())
-      };
-      await this.token.actor.update({
-        flags: {
-          [__MODULE_ID__]: flags
-        }
-      });
-    }
-  }
-
-  public setNameplates(nameplates: SerializedNameplate[]) {
-    if (!nameplates.length) {
-      nameplates.push(foundry.utils.mergeObject(
-        foundry.utils.deepClone(DefaultNameplate),
-        this.token.nameplate ?
-          {
-            style: this.token.nameplate.style.clone()
-          } : {}
-      ) as SerializedNameplate)
-    }
-    for (let i = 0; i < nameplates.length; i++) {
-      const config = nameplates[i];
-      const nameplate = this.nameplates[i] ?? this.addText(config.value);
-      nameplate.deserialize(config)
-    }
-    // Clean up excess plates
-    if (this.nameplates.length > nameplates.length) {
-      const removed = this.nameplates.splice(nameplates.length, this.nameplates.length - nameplates.length);
-      removed.forEach(item => { item.destroy(); });
-    }
-
-  }
-
-  public refreshPosition() {
-
-    const tokenWidth = this.token.document.width * (canvas?.scene?.dimensions.size ?? 100);
-    let bottomY = this.token.document.height * (canvas?.scene?.dimensions.size ?? 100);
-    let topY = 0;
-
-    const nameplates = this.nameplates;
-    for (const nameplate of nameplates) {
-      if (!nameplate.enabled) {
-        nameplate.object.visible = false;
-        continue;
-      }
-      if (nameplate.position === "bottom") {
-        nameplate.y = bottomY;
-        bottomY += nameplate.height + nameplate.padding.y;
-        nameplate.anchor.y = 0;
-      } else if (nameplate.position === "top") {
-        nameplate.y = topY;
-        topY -= (nameplate.height + nameplate.padding.y);
-        nameplate.anchor.y = 1;
-      }
-
-      switch (nameplate.align) {
-        case "left":
-          nameplate.x = 0;
-          nameplate.anchor.x = 0;
-          break;
-        case "center":
-          nameplate.x = (tokenWidth / 2) + nameplate.padding.x;
-          nameplate.anchor.x = 0.5;
-          break;
-        case "justify":
-          nameplate.x = nameplate.padding.x;
-          nameplate.anchor.x = 0;
-          break;
-        case "right":
-          nameplate.x = tokenWidth - nameplate.padding.x;
-          nameplate.anchor.x = 1;
-          break;
+    const top = this.topNameplates.sort((a, b) => a.sort - b.sort);
+    y = this.token.object.tooltip?.y ?? 0;
+    for (const plate of top) {
+      if (plate.alwaysVisible || this.token.object.tooltip?.visible) {
+        plate.object.visible = true;
+        plate.y = y;
+        plate.x = (width - plate.width) / 2;
+        y -= (plate.height + 2);
+      } else {
+        plate.object.visible = false;
       }
     }
   }
+
+  protected loadFromActor() {
+    if (this.actor?.flags[__MODULE_ID__] && this.token?.object) {
+      const config = this.actor.flags[__MODULE_ID__];
+      if (typeof config.enabled === "boolean") this.enabled = config.enabled;
+
+      // Remove all nameplates
+      for (const plate of this.nameplates)
+        plate.destroy();
+      this.nameplates.splice(0, this.nameplates.length);
+
+      // Recreate
+      this.nameplates.push(...(config.nameplates ?? []).map(plate => Nameplate.deserialize(this.token!.object!, plate)));
+      if (this.topNameplates.length) this.topContainer.addChild(...this.topNameplates.map(plate => plate.object));
+      if (this.bottomNameplates.length) this.bottomContainer.addChild(...this.bottomNameplates.map(plate => plate.object));
+
+      // Ensure properly positioned/sized
+      this.refreshNameplates();
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public actorUpdated(delta: DeepPartial<Actor>) { this.loadFromActor(); }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public tokenUpdated(delta: DeepPartial<TokenDocument>) { this.loadFromActor(); }
+
+  public draw() { /* TODO */ }
+  public refreshState() { this.refreshNameplates(); }
+  public refreshSize() { this.refreshNameplates(); }
+  public refreshNameplate() { this.refreshNameplates(); }
+  public refreshTooltip() { this.refreshNameplates(); }
 
   public destroy() {
-    this.nameplates.forEach(nameplate => { nameplate.destroy(); });
-
-    const index = TokenNameplates.tokens.indexOf(this);
-    if (index > -1) TokenNameplates.tokens.splice(index, 1);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public tokenUpdated(delta: DeepPartial<TokenDocument>) {
-    this.refreshNameplate();
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public actorUpdated(delta: DeepPartial<Actor>) {
-    this.refreshNameplate();
+    if (!this.destroyed) {
+      this.#destroyed = true;
+      for (const nameplate of this.nameplates)
+        nameplate.destroy();
+      this.nameplates.splice(0, this.nameplates.length);
+    }
   }
 
 
+  public async save(): Promise<NameplateConfiguration> {
+    const config = this.serialize();
+    if (this.actor)
+      await this.actor.update({ flags: { [__MODULE_ID__]: config } });
 
-  constructor(public readonly token: foundry.canvas.placeables.Token) {
-    const nameplates = token.actor?.flags[__MODULE_ID__]?.nameplates;
-    if (Array.isArray(nameplates) && nameplates.length) {
-      this.setNameplates(nameplates);
-    } else if (token.nameplate) {
-      token.nameplate.renderable = false;
-      const nameplate = this.addText("{name}");
-      nameplate.style = token.nameplate.style.clone();
+    return config;
+  }
+
+  public serialize(): NameplateConfiguration {
+    return {
+      ...foundry.utils.deepClone(DefaultSettings),
+      enabled: this.enabled,
+      nameplates: this.nameplates.map(nameplate => nameplate.serialize())
+    }
+  }
+
+  constructor(actor: Actor)
+  constructor(token: TokenDocument)
+  constructor(token: foundry.canvas.placeables.Token)
+  constructor(obj: Actor | TokenDocument | Token) {
+    if (obj instanceof Actor) {
+      this.actor = obj;
+      if (obj.token) this.token = obj.token;
+    } else if (obj instanceof foundry.canvas.placeables.Token) {
+      if (obj.actor instanceof Actor) this.actor = obj.actor;
+      if (obj.document instanceof TokenDocument) this.token = obj.document;
+    } else if (obj instanceof TokenDocument) {
+      this.token = obj;
+      if (obj.actor instanceof Actor) this.actor = obj.actor;
+    }
+
+    this.topContainer.name = "Top Nameplates";
+    this.bottomContainer.name = "Bottom Nameplates";
+
+    if (this.token?.object) {
+      this.token.object.addChild(this.topContainer);
+      this.token.object.addChild(this.bottomContainer);
+
+      if (this.token.object.nameplate) this.token.object.nameplate.renderable = false;
+      if (this.token.object.tooltip) this.token.object.tooltip.renderable = false;
+
+      this.loadFromActor();
     }
   }
 }
+
