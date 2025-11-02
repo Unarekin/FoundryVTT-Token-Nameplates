@@ -1,0 +1,16 @@
+{
+  "NAMEPLATES": {
+    "SETTINGS": {
+      "GLOBAL": {
+        "LABEL": "Configure",
+        "TEXT": "Global Settings",
+        "HINT": "Configure default nameplate settings",
+        "LIST": {
+          "TITLE": "Global Nameplate Settings",
+          "DESCRIPTION": "Configure global nameplate settings for type:"
+        },
+        "TITLE": "Global Nameplate Settings: {type}"
+      }
+    }
+  }
+}

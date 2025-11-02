@@ -181,6 +181,8 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     context.fontSelect = generateFontSelectOptions();
     context.displaySelect = generateDisplaySelectOptions();
 
+    context.idPrefix = this.#config?.id;
+
     context.buttons = [
       { type: "button", icon: "fa-solid fa-times", label: "Cancel", action: "cancel" },
       { type: "submit", icon: "fa-solid fa-save", label: "SETTINGS.Save" }

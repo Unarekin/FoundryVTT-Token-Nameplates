@@ -1,0 +1,7 @@
+<div class="flexcol">
+  <div>{{localize "NAMEPLATES.SETTINGS.GLOBAL.LIST.DESCRIPTION"}}</div>
+  <p></p>
+  {{#each types as |type|}}
+    <button type="button" data-action="configure" data-type="{{type.value}}">{{localize type.label}}</button>
+  {{/each}}
+</div>
