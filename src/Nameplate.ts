@@ -78,11 +78,7 @@ export class Nameplate {
   public get text() { return this.#text }
   public set text(val) {
     this.#text = val;
-    const data = getInterpolationData(this.token.document);
-    if (this.object instanceof foundry.canvas.containers.PreciseText)
-      this.object.text = interpolate(val, data, true);
-    else if (this.object instanceof PIXI.HTMLText)
-      this.object.text = interpolate(val, data, false);
+    this.refreshText();
   }
 
   public get actualText() { return this.object.text; }
@@ -118,7 +114,13 @@ export class Nameplate {
     if (!this.object.destroyed && this.token.nameplate !== this.object) this.object.destroy();
   }
 
-
+  public refreshText() {
+    const data = getInterpolationData(this.token.document);
+    if (this.object instanceof foundry.canvas.containers.PreciseText)
+      this.object.text = interpolate(this.text, data, true);
+    else if (this.object instanceof PIXI.HTMLText)
+      this.object.text = interpolate(this.text, data, false);
+  }
 
   constructor(token: foundry.canvas.placeables.Token, text?: string)
   constructor(token: foundry.canvas.placeables.Token, text?: foundry.canvas.containers.PreciseText)
@@ -127,6 +129,8 @@ export class Nameplate {
       this.object = arg;
     else
       this.object = new foundry.canvas.containers.PreciseText(typeof arg === "string" ? arg : "");
+
+    if (typeof arg === "string") this.text = arg;
     this.object.style.wordWrap = true;
   }
 }

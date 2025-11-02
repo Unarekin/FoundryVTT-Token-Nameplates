@@ -24,6 +24,7 @@ export function getInterpolationData(doc: TokenDocument): Record<string, unknown
   return foundry.utils.flattenObject(
     foundry.utils.mergeObject(doc.toObject(), {
       actor: doc.actor?.toObject() ?? {},
+      tooltip: (doc.object?.tooltip?.text ?? ""),
       flags: foundry.utils.mergeObject({
         ...(doc.actor?.flags ?? {}),
         ...(doc.flags ?? {})
@@ -56,6 +57,7 @@ export function serializeStyle(style: PIXI.TextStyle) {
 export function getDefaultNameplate(): SerializedNameplate {
   const val = foundry.utils.deepClone(DefaultNameplate);
   val.style = serializeStyle(CONFIG.canvasTextStyle);
+  val.style.fontSize = 24;
 
   return val;
 }

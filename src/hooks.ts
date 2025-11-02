@@ -73,6 +73,12 @@ Hooks.once("init", () => {
   if (nameplate instanceof NameplateToken) nameplate.tokenUpdated(delta);
 });
 
+// // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unused-vars
+// (Hooks as any).on("refreshToken", (token: foundry.canvas.placeables.Token, options: unknown) => {
+//   const nameplate = TokenNameplates.tokens.find(nameplate => nameplate.token?.object === token);
+//   if (nameplate instanceof NameplateToken) nameplate.refreshNameplate();
+// });
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
 (Hooks as any).on("updateActor", (actor: Actor, delta: DeepPartial<Actor>) => {
   const nameplate = TokenNameplates.tokens.find(nameplate => nameplate.actor === actor);

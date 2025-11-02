@@ -182,6 +182,10 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
             ...getDefaultNameplate(),
             id: foundry.utils.randomID(),
             value: "{name}"
+          }, {
+            ...getDefaultNameplate(),
+            id: foundry.utils.randomID(),
+            value: "{tooltip}"
           });
         }
       }

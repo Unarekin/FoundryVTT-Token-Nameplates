@@ -1,6 +1,7 @@
 import { DeepPartial, NameplateConfiguration } from "types";
 import { Nameplate } from "./Nameplate";
 import { DefaultSettings } from "settings";
+import { serializeStyle } from "functions";
 
 export class NameplateToken {
   #destroyed = false;
@@ -28,7 +29,6 @@ export class NameplateToken {
     }
   }
 
-
   protected refreshNameplates() {
     if (!this.token?.object) return;
     const { width } = this.token.object.bounds;
@@ -36,8 +36,9 @@ export class NameplateToken {
     const bottom = this.bottomNameplates.sort((a, b) => a.sort - b.sort);
     let y = this.token.object.nameplate?.y ?? 0;
     for (const plate of bottom) {
-      if (plate.alwaysVisible || this.token.object.nameplate?.visible) {
+      if (this.token.object.nameplate?.visible) {
         plate.object.visible = true;
+        plate.refreshText();
         plate.y = y;
         plate.x = (width - plate.width) / 2;
         y += plate.height + 2;
@@ -48,13 +49,14 @@ export class NameplateToken {
 
 
     const top = this.topNameplates.sort((a, b) => a.sort - b.sort);
-    y = this.token.object.tooltip?.y ?? 0;
+    y = (this.token.object.tooltip?.y ?? 0);
     for (const plate of top) {
-      if (plate.alwaysVisible || this.token.object.tooltip?.visible) {
+      if (this.token.object.tooltip?.visible && !(plate.text === "{tooltip}" && this.token.object.tooltip?.text === "")) {
         plate.object.visible = true;
+        plate.refreshText();
+        y -= (plate.height + 2);
         plate.y = y;
         plate.x = (width - plate.width) / 2;
-        y -= (plate.height + 2);
       } else {
         plate.object.visible = false;
       }
@@ -73,6 +75,22 @@ export class NameplateToken {
 
       // Recreate
       this.nameplates.push(...(config.nameplates ?? []).map(plate => Nameplate.deserialize(this.token!.object!, plate)));
+
+      if (this.nameplates.length === 0) {
+        if (this.token.object.nameplate) {
+          const nameplate = new Nameplate(this.token.object, "{name}");
+          nameplate.style = serializeStyle(this.token.object.nameplate.style);
+          this.nameplates.push(nameplate);
+        }
+
+        if (this.token.object.tooltip) {
+          const nameplate = new Nameplate(this.token.object, "{tooltip}");
+          nameplate.position = "top";
+          nameplate.style = serializeStyle(this.token.object.tooltip.style);
+          this.nameplates.push(nameplate);
+        }
+      }
+
       if (this.topNameplates.length) this.topContainer.addChild(...this.topNameplates.map(plate => plate.object));
       if (this.bottomNameplates.length) this.bottomContainer.addChild(...this.bottomNameplates.map(plate => plate.object));
 
