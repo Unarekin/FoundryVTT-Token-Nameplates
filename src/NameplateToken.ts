@@ -39,9 +39,11 @@ export class NameplateToken {
       if (this.token.object.nameplate?.visible) {
         plate.object.visible = true;
         plate.refreshText();
-        plate.y = y;
-        plate.x = (width - plate.width) / 2;
-        y += plate.height + 2;
+        plate.style.wordWrapWidth = width * 2.5;
+        plate.style.wordWrap = true;
+        plate.y = y + plate.padding.y;
+        plate.x = ((width - plate.width) / 2) + plate.padding.x;
+        y += plate.height + 2 + plate.padding.x;
       } else {
         plate.object.visible = false;
       }
@@ -54,9 +56,11 @@ export class NameplateToken {
       if (this.token.object.tooltip?.visible && !(plate.text === "{tooltip}" && this.token.object.tooltip?.text === "")) {
         plate.object.visible = true;
         plate.refreshText();
-        y -= (plate.height + 2);
+        y -= (plate.height + 2 + plate.padding.y);
+        plate.style.wordWrapWidth = width * 2.5;
+        plate.style.wordWrap = true;
         plate.y = y;
-        plate.x = (width - plate.width) / 2;
+        plate.x = ((width - plate.width) / 2) + plate.padding.x;
       } else {
         plate.object.visible = false;
       }
