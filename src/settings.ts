@@ -1,9 +1,11 @@
+import { ActorTypeSelectionApplication } from "applications"
 import { NameplateConfiguration, SerializedNameplate } from "types"
 
 declare global {
   interface SettingsConfig {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    [__MODULE_ID__]: {} // Placeholder for later
+    [__MODULE_ID__]: {
+      globalConfigurations: Record<string, NameplateConfiguration>
+    } // Placeholder for later
   }
 
   interface FlagConfig {
@@ -33,35 +35,26 @@ export const DefaultNameplate: SerializedNameplate = {
   alpha: 1,
   // style: CONFIG.canvasTextStyle as unknown as Record<string, unknown>
   style: {}
-  // style: {
-  //   align: "left",
-  //   breakWords: false,
-  //   dropShadow: false,
-  //   dropShadowAlpha: 1,
-  //   dropShadowAngle: 0.5235987755982988,
-  //   dropShadowBlur: 0,
-  //   dropShadowColor: "black",
-  //   dropShadowDistance: 5,
-  //   fill: "black",
-  //   fillGradientType: 0,
-  //   fillGradientStops: [],
-  //   fontFamily: "Arial",
-  //   fontSize: 26,
-  //   fontStyle: "normal",
-  //   fontVariant: "normal",
-  //   fontWeight: "normal",
-  //   leading: 0,
-  //   letterSpacing: 0,
-  //   lineHeight: 0,
-  //   lineJoin: "miter",
-  //   miterLimit: 10,
-  //   padding: 0,
-  //   stroke: "black",
-  //   strokeThickness: 0,
-  //   textBaseline: "alphabetic",
-  //   trim: false,
-  //   whiteSpace: "pre",
-  //   wordWrap: true,
-  //   wordWrapWidth: 100
-  // }
 }
+
+Hooks.once("ready", () => {
+  game.settings?.registerMenu(__MODULE_ID__, `globalConfigMenu`, {
+    name: game.i18n?.localize("NAMEPLATES.SETTINGS.GLOBAL.TEXT") ?? "",
+    label: game.i18n?.localize("NAMEPLATES.SETTINGS.GLOBAL.LABEL") ?? "",
+    hint: game.i18n?.localize("NAMEPLATES.SETTINGS.GLOBAL.HINT") ?? "",
+    icon: "fa-solid fa-cogs",
+    type: ActorTypeSelectionApplication,
+    restricted: true
+  });
+
+  game.settings?.register(__MODULE_ID__, "globalConfigurations", {
+    name: "Global Configurations",
+    hint: "",
+    scope: "world",
+    config: false,
+    requiresReload: false,
+    type: Object,
+    default: {},
+    onChange() { TokenNameplates.tokens.forEach(token => token.actorUpdated({})); }
+  })
+})

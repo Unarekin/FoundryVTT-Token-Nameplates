@@ -21,6 +21,10 @@
         "HINT": "Toggle on to enable Token Nameplates for this token.",
         "LABEL": "Enable Nameplates"
       },
+      "ENABLEGLOBAL": {
+        "HINT": "Toggle on to use default nameplates for this actor type.",
+        "LABEL": "Enable Default Nameplates"
+      },
       "FONT": {
         "COLOR": {
           "HINT": "",
@@ -65,6 +69,12 @@
         "CONTENT": "Are you sure you want to remove this nameplate?\nThis cannot be undone.",
         "TITLE": "Remove Nameplate"
       },
+      "REVERT": {
+        "HINT": "Revert settings back to default.",
+        "LABEL": "Revert Settings",
+        "TITLE": "Revert Settings",
+        "MESSAGE": "Are you sure you want to revert these settings back to default?"
+      },
       "TABS": {
         "BASICS": "Basics",
         "FONT": "Font"
@@ -76,6 +86,9 @@
         "EDIT": "Edit nameplate",
         "REMOVE": "Remove nameplate",
         "UP": "Move nameplate up"
+      },
+      "TYPES": {
+        "GLOBAL": "Global"
       },
       "UPPER": "Upper Nameplates",
       "VALUE": {

@@ -1,10 +1,22 @@
-<div class="tab{{#if tab.active}} active{{/if}} token-nameplates-config" data-group="{{#if microMap.isV1}}main{{else}}sheet{{/if}}" data-tab="nameplates" data-application-part="nameplates" style="overflow-y:auto;overflow-x:hidden">
+<div class="tab{{#if tab.active}} active{{/if}} token-nameplates-config" data-group="sheet" data-tab="nameplates" data-application-part="nameplates" style="overflow-y:auto;overflow-x:hidden">
   {{#with nameplates}}
     <div class="form-group">
-      <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLE.LABEL"}}</label>
-      <input type="checkbox" id="{{idPrefix}}-nameplates-enabled" name="nameplates.enabled" {{checked enabled}}>
-      <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLE.HINT"}}</p>
+      {{#if ../globalConfig }}
+        <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLEGLOBAL.LABEL"}}</label>
+        <input type="checkbox" id="{{idPrefix}}-nameplates-enabled" name="nameplates.enabled" {{checked enabled}}>
+        <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLEGLOBAL.HINT"}}</p>
+      {{else}}
+        <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLE.LABEL"}}</label>
+        <input type="checkbox" id="{{idPrefix}}-nameplates-enabled" name="nameplates.enabled" {{checked enabled}}>
+        <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLE.HINT"}}</p>
+      {{/if}}
     </div>
+
+    <div class="form-group">
+      <button type="button" data-action="revertNameplates">{{localize "NAMEPLATES.CONFIG.REVERT.LABEL"}}</button>
+      <p class="hint">{{localize "NAMEPLATES.CONFIG.REVERT.HINT"}}</p>
+    </div>
+    
 
     <div class="flexrow">
       <div class="flex1">

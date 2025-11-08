@@ -1,4 +1,4 @@
-import { getInterpolationData, interpolate, confirm, serializeStyle, getDefaultNameplate } from "functions";
+import { getInterpolationData, interpolate, confirm, serializeStyle, getDefaultNameplate, getDefaultSettings } from "functions";
 import { DeepPartial, NameplateConfiguration } from "../types";
 import { generateFontSelectOptions } from "./functions";
 import { LocalizedError } from "../errors";
@@ -9,6 +9,7 @@ import { DefaultSettings } from "settings";
 export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenConfig) {
   class TokenConfiguration extends Base {
     #flags: NameplateConfiguration | undefined = undefined;
+    #hasChanges = false;
 
     public static DEFAULT_OPTIONS: DeepPartial<foundry.applications.api.DocumentSheetV2.Configuration<any>> = {
       actions: {
@@ -21,7 +22,9 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         // eslint-disable-next-line @typescript-eslint/unbound-method
         moveNameplateUp: TokenConfiguration.MoveNameplateUp,
         // eslint-disable-next-line @typescript-eslint/unbound-method
-        removeNameplate: TokenConfiguration.RemoveNameplate
+        removeNameplate: TokenConfiguration.RemoveNameplate,
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        revertNameplates: TokenConfiguration.RevertNameplates
       }
     }
 
@@ -39,6 +42,21 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
         this.#flags.nameplates[index] = this.#flags.nameplates[index - 1];
         this.#flags.nameplates[index - 1] = nameplate;
+        this.#hasChanges = true;
+        await this.render();
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error) ui.notifications?.error(err.message, { console: false });
+      }
+    }
+
+    static async RevertNameplates(this: TokenConfiguration) {
+      try {
+        const confirmed = await confirm("NAMEPLATES.CONFIG.REVERT.TITLE", game?.i18n?.localize("NAMEPLATES.CONFIG.REVERT.MESSAGE") ?? "");
+        if (!confirmed) return;
+
+        this.#flags = foundry.utils.deepClone(getDefaultSettings());
+        this.#hasChanges = true;
         await this.render();
       } catch (err) {
         console.error(err);
@@ -59,6 +77,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         const nameplate = this.#flags.nameplates[index];
         this.#flags.nameplates[index] = this.#flags.nameplates[index + 1];
         this.#flags.nameplates[index + 1] = nameplate;
+        this.#hasChanges = true;
         await this.render();
       } catch (err) {
         console.error(err);
@@ -80,6 +99,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
         if (nameplate) {
           this.#flags.nameplates.push(nameplate);
+          this.#hasChanges = true;
           await this.render();
         }
       } catch (err) {
@@ -105,6 +125,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
         const index = this.#flags.nameplates.findIndex(item => item.id === id);
         if (index > -1) this.#flags.nameplates.splice(index, 1);
+        this.#hasChanges = true;
         await this.render();
       } catch (err) {
         console.error(err);
@@ -126,6 +147,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
           edited.style = serializeStyle(edited.style as unknown as PIXI.TextStyle);
           const index = this.#flags.nameplates.findIndex(item => item.id === edited.id);
           if (index > -1) this.#flags.nameplates.splice(index, 1, edited);
+          this.#hasChanges = true;
           await this.render();
         }
       } catch (err) {
@@ -136,60 +158,56 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
     async _onSubmitForm(formConfig: foundry.applications.api.ApplicationV2.FormConfiguration, event: Event | SubmitEvent): Promise<void> {
       if (!this.form) return;
+      if (this.#hasChanges) {
+        const data = foundry.utils.expandObject(new foundry.applications.ux.FormDataExtended(this.form).object) as Record<string, unknown>;
 
-      const data = foundry.utils.expandObject(new foundry.applications.ux.FormDataExtended(this.form).object) as Record<string, unknown>;
+        const config: NameplateConfiguration = {
+          ...DefaultSettings,
+          ...(this.#flags ?? {}),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          enabled: (data.nameplates as any)?.enabled ?? true,
+          nameplates: Array.isArray(this.#flags?.nameplates) ? foundry.utils.deepClone(this.#flags.nameplates) : []
+        };
 
-      const config: NameplateConfiguration = {
-        ...DefaultSettings,
-        ...(this.#flags ?? {}),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        enabled: (data.nameplates as any)?.enabled ?? true,
-        nameplates: Array.isArray(this.#flags?.nameplates) ? foundry.utils.deepClone(this.#flags.nameplates) : []
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const actor = ((this as any).token as foundry.canvas.placeables.Token).actor as Actor | undefined;
-      actor?.update({
-        flags: {
-          [__MODULE_ID__]: config
-        }
-      })
-
-        .catch((err: Error) => {
-          console.error(err);
-          ui.notifications?.error(err.message, { console: false });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const actor = ((this as any).token as foundry.canvas.placeables.Token).actor as Actor | undefined;
+        actor?.update({
+          flags: {
+            [__MODULE_ID__]: config
+          }
         })
+          .then(() => { this.#hasChanges = false; })
+          .catch((err: Error) => {
+            console.error(err);
+            ui.notifications?.error(err.message, { console: false });
+          })
 
+      }
       return super._onSubmitForm(formConfig, event);
+    }
+
+    async _onRender(context: TokenConfig.RenderContext, options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
+      await super._onRender(context, options);
+
+      const enable = this.element.querySelector(`[name="nameplates.enabled"]`);
+      if (enable instanceof HTMLInputElement) {
+        enable.addEventListener("change", () => { this.#hasChanges = true; })
+      }
     }
 
     async _prepareContext(options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       const context = await super._prepareContext(options);
 
       if (options.force || options.isFirstRender || !this.#flags) {
-        this.#flags = foundry.utils.mergeObject({
-          enabled: true,
-          version: __MODULE_VERSION__,
-          nameplates: []
-        },
+        const defaultSettings = getDefaultSettings();
+        this.#flags = foundry.utils.mergeObject(
+          foundry.utils.deepClone(defaultSettings),
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           ((this as any).actor.flags[__MODULE_ID__] ?? {}),
         ) as NameplateConfiguration;
-
-        if (!this.#flags.nameplates?.length) {
-          // Add placeholder
-          this.#flags.nameplates.push({
-            ...getDefaultNameplate(),
-            id: foundry.utils.randomID(),
-            value: "{name}"
-          }, {
-            ...getDefaultNameplate(),
-            id: foundry.utils.randomID(),
-            value: "{tooltip}"
-          });
-        }
+        // Re-inject nameplates if there are none
+        if (!this.#flags.nameplates.length) this.#flags.nameplates.push(...defaultSettings.nameplates);
       }
-
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (context as any).nameplates = {
