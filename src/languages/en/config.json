@@ -25,6 +25,14 @@
         "HINT": "Toggle on to use default nameplates for this actor type.",
         "LABEL": "Enable Default Nameplates"
       },
+      "EXPORT": {
+        "HINT": "Export JSON configuration",
+        "LABEL": "Export Configuration",
+        "CLIPBOARD": "Copy to Clipboard",
+        "DOWNLOAD": "Download JSON",
+        "COPIED": "Configuration copied to clipboard",
+        "DIALOGMESSAGE": "Copy the text below"
+      },
       "FONT": {
         "COLOR": {
           "HINT": "",
@@ -52,6 +60,14 @@
         }
       },
       "HEADER": "Nameplates",
+      "IMPORT": {
+        "HINT": "Import JSON configuration",
+        "LABEL": "Import Configuration",
+        "CLIPBOARD": "Import from Clipboard",
+        "UPLOAD": "Upload JSON",
+        "DIALOGMESSAGE": "Paste the JSON below",
+        "PASTED": "Configuration read from clipboard"
+      },
       "LOWER": "Lower Nameplates",
       "PADDING": {
         "HINT": "Space above and to the left of the nameplate",
@@ -72,8 +88,8 @@
       "REVERT": {
         "HINT": "Revert settings back to default.",
         "LABEL": "Revert Settings",
-        "TITLE": "Revert Settings",
-        "MESSAGE": "Are you sure you want to revert these settings back to default?"
+        "MESSAGE": "Are you sure you want to revert these settings back to default?",
+        "TITLE": "Revert Settings"
       },
       "TABS": {
         "BASICS": "Basics",
@@ -85,7 +101,9 @@
         "DOWN": "Move nameplate down",
         "EDIT": "Edit nameplate",
         "REMOVE": "Remove nameplate",
-        "UP": "Move nameplate up"
+        "UP": "Move nameplate up",
+        "EXPORT": "Export the current configuration as JSON",
+        "IMPORT": "Import a JSON configuration"
       },
       "TYPES": {
         "GLOBAL": "Global"

@@ -1,6 +1,6 @@
 import { GlobalConfigContext, GlobalConfigConfiguration, GlobalNameplateConfig } from "./types";
 import { DeepPartial, NameplateConfiguration } from "../types";
-import { confirm, getDefaultNameplate, getDefaultSettings, serializeStyle } from "functions";
+import { confirm, getDefaultNameplate, getDefaultSettings, serializeStyle, downloadJSON, uploadJSON } from "functions";
 import { NameplateConfigApplication } from "./NameplateConfig";
 import { LocalizedError } from "errors";
 import { DefaultSettings } from "settings";
@@ -180,6 +180,25 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
     }
   }
 
+  protected async finishImport(data: NameplateConfiguration) {
+    if (!this.#config) return;
+    if (typeof data.enabled === "boolean") this.#config.enabled = data.enabled;
+    this.#config.nameplates.splice(0, this.#config.nameplates.length, ...(Array.isArray(data.nameplates) ? data.nameplates : []));
+    await this.render();
+  }
+
+  protected async uploadFile() {
+    try {
+      if (!this.#config) return;
+      const data = await uploadJSON<NameplateConfiguration>();
+      if (!data) return;
+      await this.finishImport(data);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error) ui.notifications?.error(err.message, { console: false });
+    }
+  }
+
   static async MoveNameplateDown(this: GlobalConfigApplication, e: PointerEvent, elem: HTMLElement) {
     try {
       if (!this.#config?.nameplates?.length) return;
@@ -205,6 +224,102 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
   }
 
 
+  protected async exportToClipboard() {
+    try {
+      if ((await navigator.permissions.query({ name: "clipboard-write" })).state === "granted") {
+        await navigator.clipboard.writeText(JSON.stringify(this.#config));
+        ui.notifications?.info("NAMEPLATES.CONFIG.EXPORT.COPIED", { localize: true });
+      } else {
+        const content = await foundry.applications.handlebars.renderTemplate(`modules/${__MODULE_ID__}/templates/CopyJSON.hbs`, {
+          config: JSON.stringify(this.#config, null, 2)
+        });
+        await foundry.applications.api.DialogV2.input({
+          window: { title: "NAMEPLATES.CONFIG.EXPORT.LABEL" },
+          position: { width: 600 },
+          content
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error) ui.notifications?.error(err.message, { console: false });
+    }
+  }
+
+  protected async importFromClipboard() {
+    try {
+      if ((await navigator.permissions.query({ name: "clipboard-read" })).state === "granted") {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          const data = JSON.parse(text) as NameplateConfiguration;
+          ui.notifications?.info("NAMEPLATES.CONFIG.IMPORT.PASTED", { localize: true });
+          if (data) await this.finishImport(data);
+        }
+      } else {
+        const content = await foundry.applications.handlebars.renderTemplate(`modules/${__MODULE_ID__}/templates/PasteJSON.hbs`, {});
+        const { json } = await foundry.applications.api.DialogV2.input({
+          window: { title: "NAMEPLATES.CONFIG.IMPORT.LABEL" },
+          position: { width: 600 },
+          content
+        });
+        if (typeof json === "string") {
+          const data = JSON.parse(json) as NameplateConfiguration;
+          if (data) await this.finishImport(data)
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error) ui.notifications?.error(err.message, { console: false });
+    }
+  }
+
+  async _onRender(context: GlobalConfigContext, options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
+    await super._onRender(context, options);
+    // Export menu
+    new foundry.applications.ux.ContextMenu(
+      this.element,
+      `[data-role="export-nameplates"]`,
+      [
+        {
+          name: "NAMEPLATES.CONFIG.EXPORT.CLIPBOARD",
+          icon: `<i class="fa-solid fa-copy"></i>`,
+          callback: () => { void this.exportToClipboard(); }
+        },
+        {
+          name: "NAMEPLATES.CONFIG.EXPORT.DOWNLOAD",
+          icon: `<i class="fa-solid fa-download"></i>`,
+          callback: () => { downloadJSON(this.#config as object, "nameplates.json"); }
+        }
+      ],
+      {
+        jQuery: false,
+        eventName: "click",
+        fixed: true
+      }
+    );
+
+    // Import menu
+    new foundry.applications.ux.ContextMenu(
+      this.element,
+      `[data-role="import-nameplates"]`,
+      [
+        {
+          name: "NAMEPLATES.CONFIG.IMPORT.CLIPBOARD",
+          icon: `<i class="fa-solid fa-paste"></i>`,
+          callback: () => { void this.importFromClipboard(); }
+        },
+        {
+          name: "NAMEPLATES.CONFIG.IMPORT.UPLOAD",
+          icon: `<i class="fa-solid fa-upload"></i>`,
+          callback: () => { void this.uploadFile(); }
+        }
+      ],
+      {
+        jQuery: false,
+        eventName: "click",
+        fixed: true
+      }
+    )
+  }
 
   protected async _prepareContext(options: foundry.applications.api.ApplicationV2.RenderOptions): Promise<GlobalConfigContext> {
     const context = await super._prepareContext(options);

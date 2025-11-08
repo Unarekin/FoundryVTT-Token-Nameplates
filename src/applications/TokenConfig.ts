@@ -1,4 +1,4 @@
-import { getInterpolationData, interpolate, confirm, serializeStyle, getDefaultNameplate, getDefaultSettings } from "functions";
+import { getInterpolationData, interpolate, confirm, serializeStyle, getDefaultNameplate, getDefaultSettings, downloadJSON, uploadJSON } from "functions";
 import { DeepPartial, NameplateConfiguration } from "../types";
 import { generateFontSelectOptions } from "./functions";
 import { LocalizedError } from "../errors";
@@ -24,7 +24,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         // eslint-disable-next-line @typescript-eslint/unbound-method
         removeNameplate: TokenConfiguration.RemoveNameplate,
         // eslint-disable-next-line @typescript-eslint/unbound-method
-        revertNameplates: TokenConfiguration.RevertNameplates
+        revertNameplates: TokenConfiguration.RevertNameplates,
       }
     }
 
@@ -186,6 +186,75 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       return super._onSubmitForm(formConfig, event);
     }
 
+    protected async exportToClipboard() {
+      try {
+        if ((await navigator.permissions.query({ name: "clipboard-write" })).state === "granted") {
+          await navigator.clipboard.writeText(JSON.stringify(this.#flags));
+          ui.notifications?.info("NAMEPLATES.CONFIG.EXPORT.COPIED", { localize: true });
+        } else {
+          const content = await foundry.applications.handlebars.renderTemplate(`modules/${__MODULE_ID__}/templates/CopyJSON.hbs`, {
+            config: JSON.stringify(this.#flags, null, 2)
+          });
+          await foundry.applications.api.DialogV2.input({
+            window: { title: "NAMEPLATES.CONFIG.EXPORT.LABEL" },
+            position: { width: 600 },
+            content
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error) ui.notifications?.error(err.message, { console: false });
+      }
+    }
+
+    protected async finishImport(data: NameplateConfiguration) {
+      if (!this.#flags) return;
+      if (typeof data.enabled === "boolean") this.#flags.enabled = data.enabled;
+
+      this.#flags.nameplates.splice(0, this.#flags.nameplates.length, ...(Array.isArray(data.nameplates) ? data.nameplates : []))
+      this.#hasChanges = true;
+      await this.render();
+    }
+
+    protected async importFromClipboard() {
+      try {
+        if ((await navigator.permissions.query({ name: "clipboard-read" })).state === "granted") {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            const data = JSON.parse(text) as NameplateConfiguration;
+            ui.notifications?.info("NAMEPLATES.CONFIG.IMPORT.PASTED", { localize: true });
+            if (data) await this.finishImport(data);
+          }
+        } else {
+          const content = await foundry.applications.handlebars.renderTemplate(`modules/${__MODULE_ID__}/templates/PasteJSON.hbs`, {});
+          const { json } = await foundry.applications.api.DialogV2.input({
+            window: { title: "NAMEPLATES.CONFIG.IMPORT.LABEL" },
+            position: { width: 600 },
+            content
+          });
+          if (typeof json === "string") {
+            const data = JSON.parse(json) as NameplateConfiguration;
+            if (data) await this.finishImport(data)
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error) ui.notifications?.error(err.message, { console: false });
+      }
+    }
+
+    protected async uploadFile() {
+      try {
+        if (!this.#flags) return;
+        const data = await uploadJSON<NameplateConfiguration>();
+        if (!data) return;
+        await this.finishImport(data);
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error) ui.notifications?.error(err.message, { console: false });
+      }
+    }
+
     async _onRender(context: TokenConfig.RenderContext, options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       await super._onRender(context, options);
 
@@ -193,6 +262,53 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       if (enable instanceof HTMLInputElement) {
         enable.addEventListener("change", () => { this.#hasChanges = true; })
       }
+
+
+      // Export menu
+      new foundry.applications.ux.ContextMenu(
+        this.element,
+        `[data-role="export-nameplates"]`,
+        [
+          {
+            name: "NAMEPLATES.CONFIG.EXPORT.CLIPBOARD",
+            icon: `<i class="fa-solid fa-copy"></i>`,
+            callback: () => { void this.exportToClipboard(); }
+          },
+          {
+            name: "NAMEPLATES.CONFIG.EXPORT.DOWNLOAD",
+            icon: `<i class="fa-solid fa-download"></i>`,
+            callback: () => { downloadJSON(this.#flags as object, "nameplates.json"); }
+          }
+        ],
+        {
+          jQuery: false,
+          eventName: "click",
+          fixed: true
+        }
+      );
+
+      // Import menu
+      new foundry.applications.ux.ContextMenu(
+        this.element,
+        `[data-role="import-nameplates"]`,
+        [
+          {
+            name: "NAMEPLATES.CONFIG.IMPORT.CLIPBOARD",
+            icon: `<i class="fa-solid fa-paste"></i>`,
+            callback: () => { void this.importFromClipboard(); }
+          },
+          {
+            name: "NAMEPLATES.CONFIG.IMPORT.UPLOAD",
+            icon: `<i class="fa-solid fa-upload"></i>`,
+            callback: () => { void this.uploadFile(); }
+          }
+        ],
+        {
+          jQuery: false,
+          eventName: "click",
+          fixed: true
+        }
+      )
     }
 
     async _prepareContext(options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
