@@ -25,7 +25,7 @@ export interface ActorTypeSelectionContext extends foundry.applications.api.Appl
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ActorTypeSelectionConfiguration extends foundry.applications.api.ApplicationV2.Configuration { }
 
-interface GlobalNameplateConfig extends NameplateConfiguration {
+export interface GlobalNameplateConfig extends NameplateConfiguration {
   upperNameplates: SerializedNameplate[];
   lowerNameplates: SerializedNameplate[];
 }
@@ -33,6 +33,7 @@ interface GlobalNameplateConfig extends NameplateConfiguration {
 export interface GlobalConfigContext extends foundry.applications.api.ApplicationV2.RenderContext {
   type: string;
   nameplates: GlobalNameplateConfig;
+  globalConfig: boolean;
   idPrefix: string;
   buttons: foundry.applications.api.ApplicationV2.FormFooterButton[];
 }

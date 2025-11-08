@@ -54,6 +54,7 @@ Hooks.once("ready", () => {
     config: false,
     requiresReload: false,
     type: Object,
-    default: {}
+    default: {},
+    onChange() { TokenNameplates.tokens.forEach(token => token.actorUpdated({})); }
   })
 })

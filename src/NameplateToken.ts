@@ -1,7 +1,7 @@
 import { DeepPartial, NameplateConfiguration, NameplateDisplay } from "types";
 import { Nameplate } from "./Nameplate";
 import { DefaultSettings } from "settings";
-import { serializeStyle } from "functions";
+import { getNameplateSettings, serializeStyle } from "functions";
 
 const TokenDisplayHash: Record<number, NameplateDisplay> = {
   50: "always",
@@ -49,7 +49,7 @@ export class NameplateToken {
       case "always":
         return true;
       case "none":
-        return true;
+        return false;
       case "owner":
         return this.token.isOwner;
       case "control":
@@ -103,39 +103,39 @@ export class NameplateToken {
   }
 
   protected loadFromActor() {
-    if (this.actor?.flags[__MODULE_ID__] && this.token?.object) {
-      const config = this.actor.flags[__MODULE_ID__];
-      if (typeof config.enabled === "boolean") this.enabled = config.enabled;
+    if (!this.token?.object) return;
 
-      // Remove all nameplates
-      for (const plate of this.nameplates)
-        plate.destroy();
-      this.nameplates.splice(0, this.nameplates.length);
+    const config = getNameplateSettings(this.actor);
+    if (typeof config.enabled === "boolean") this.enabled = config.enabled;
 
-      // Recreate
-      this.nameplates.push(...(config.nameplates ?? []).map(plate => Nameplate.deserialize(this.token!.object!, plate)));
+    // Remove all
+    for (const plate of this.nameplates) plate.destroy();
+    this.nameplates.splice(0, this.nameplates.length);
 
-      if (this.nameplates.length === 0) {
-        if (this.token.object.nameplate) {
-          const nameplate = new Nameplate(this.token.object, "{name}");
-          nameplate.style = serializeStyle(this.token.object.nameplate.style);
-          this.nameplates.push(nameplate);
-        }
+    // Recreate
+    this.nameplates.push(...(config.nameplates ?? []).map(plate => Nameplate.deserialize(this.token!.object!, plate)));
 
-        if (this.token.object.tooltip) {
-          const nameplate = new Nameplate(this.token.object, "{tooltip}");
-          nameplate.position = "top";
-          nameplate.style = serializeStyle(this.token.object.tooltip.style);
-          this.nameplates.push(nameplate);
-        }
+    if (this.nameplates.length === 0) {
+      if (this.token.object.nameplate) {
+        const nameplate = new Nameplate(this.token.object, "{name}");
+        nameplate.style = serializeStyle(this.token.object.nameplate.style);
+        this.nameplates.push(nameplate);
       }
 
-      if (this.topNameplates.length) this.topContainer.addChild(...this.topNameplates.map(plate => plate.object));
-      if (this.bottomNameplates.length) this.bottomContainer.addChild(...this.bottomNameplates.map(plate => plate.object));
-
-      // Ensure properly positioned/sized
-      this.refreshNameplates();
+      if (this.token.object.tooltip) {
+        const nameplate = new Nameplate(this.token.object, "{tooltip}");
+        nameplate.position = "top";
+        nameplate.style = serializeStyle(this.token.object.tooltip.style);
+        this.nameplates.push(nameplate);
+      }
     }
+
+    if (this.topNameplates.length) this.topContainer.addChild(...this.topNameplates.map(plate => plate.object));
+    if (this.bottomNameplates.length) this.bottomContainer.addChild(...this.bottomNameplates.map(plate => plate.object));
+
+    // Ensure properly positioned/sized
+    this.refreshNameplates();
+
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -155,6 +155,9 @@ export class NameplateToken {
       for (const nameplate of this.nameplates)
         nameplate.destroy();
       this.nameplates.splice(0, this.nameplates.length);
+
+      const index = TokenNameplates.tokens.indexOf(this);
+      if (index > -1) TokenNameplates.tokens.splice(index, 1);
     }
   }
 

@@ -1,5 +1,5 @@
 import { DefaultNameplate } from "settings";
-import { SerializedNameplate } from "types";
+import { NameplateConfiguration, SerializedNameplate } from "types";
 
 /** Strips HTML from a given string */
 export function stripHTML(val: string): string {
@@ -60,4 +60,47 @@ export function getDefaultNameplate(): SerializedNameplate {
   val.style.fontSize = 24;
 
   return val;
+}
+
+export function getDefaultSettings(): NameplateConfiguration {
+  return {
+    enabled: false,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    version: __MODULE_VERSION__ as any,
+    nameplates: [
+      {
+        ...getDefaultNameplate(),
+        id: foundry.utils.randomID(),
+        value: "{name}"
+      },
+      {
+        ...getDefaultNameplate(),
+        position: "top",
+        id: foundry.utils.randomID(),
+        value: "{tooltip}"
+      }
+    ]
+  }
+}
+
+export function getNameplateSettings(actor?: Actor): NameplateConfiguration
+export function getNameplateSettings(token?: Token): NameplateConfiguration
+export function getNameplateSettings(token?: TokenDocument): NameplateConfiguration
+export function getNameplateSettings(obj?: unknown): NameplateConfiguration {
+  const actor: Actor | undefined = (obj instanceof Actor ? obj : obj instanceof foundry.canvas.placeables.Token ? obj.actor : obj instanceof TokenDocument ? obj.actor : undefined) ?? undefined;
+
+  const baseSettings = getDefaultSettings();
+
+  if (actor?.flags[__MODULE_ID__]?.enabled) {
+    foundry.utils.mergeObject(baseSettings, actor.flags[__MODULE_ID__]);
+  } else {
+    const globalConfig = (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) as Record<string, NameplateConfiguration>;
+    if (actor && globalConfig[actor.type]?.enabled) {
+      foundry.utils.mergeObject(baseSettings, globalConfig[actor.type])
+    } else if (globalConfig?.global?.enabled) {
+      foundry.utils.mergeObject(baseSettings, globalConfig.global);
+    }
+  }
+
+  return baseSettings;
 }

@@ -51,7 +51,7 @@ function simpleWrapper<t extends keyof PropsOfType<NameplateToken, Function>>(fu
   }
 }
 
-Hooks.once("init", () => {
+Hooks.once("ready", () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   libWrapper.register(__MODULE_ID__, "foundry.canvas.placeables.Token.prototype._draw", simpleWrapper("draw"));
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
