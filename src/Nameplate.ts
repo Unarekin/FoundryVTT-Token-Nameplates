@@ -12,10 +12,31 @@ export class Nameplate {
 
   #text = "";
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  public readonly glow = new (PIXI.filters as any).GlowFilter() as PIXI.Filter;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  public readonly outline = new (PIXI.filters as any).OutlineFilter() as PIXI.Filter;
+
   public get id() { return this.#id; }
 
   public static deserialize(token: foundry.canvas.placeables.Token, config: SerializedNameplate): Nameplate {
     return new Nameplate(token, config.value).deserialize(config);
+  }
+
+  protected getDispositionColor(): PIXI.Color {
+    if (!this.token?.document) return new PIXI.Color("white");
+
+    const disposition = Object.entries(CONST.TOKEN_DISPOSITIONS).find(([, val]) => val === (this.token?.document?.disposition ?? 0))?.[0] ?? "NEUTRAL";
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+    const color = (CONFIG.Canvas.dispositionColors as any)[disposition]
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const actualColor = new PIXI.Color(color);
+      if (actualColor instanceof PIXI.Color)
+        return actualColor;
+    } catch { /* Empty */ }
+    return new PIXI.Color("white");
   }
 
   public deserialize(config: SerializedNameplate): this {
@@ -31,6 +52,47 @@ export class Nameplate {
     this.alpha = config.alpha ?? 1;
     if (config.style) this.style = config.style;
     this.display = config.display ?? "default";
+
+    if (config.effects) {
+      const { glow, outline } = config.effects;
+      if (glow) {
+        this.glow.enabled = typeof glow.enabled === "boolean" ? glow.enabled : false;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (this.glow as any).innerStrength = typeof glow.innerStrength === "number" ? glow.innerStrength : 0;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (this.glow as any).outerStrength = typeof glow.outerStrength === "number" ? glow.outerStrength : 4;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (this.glow as any).alpha = typeof glow.alpha === "number" ? glow.alpha : 1;
+
+        if (glow.useDispositionColor) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.glow as any).color = this.getDispositionColor();
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.glow as any).color = typeof glow.color === "string" ? glow.color : "FFFFFF";
+        }
+
+      }
+
+      if (outline) {
+        this.outline.enabled = typeof outline.enabled === "boolean" ? outline.enabled : false;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (this.outline as any).alpha = typeof outline.alpha === "number" ? outline.alpha : 1;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (this.outline as any).thickness = typeof outline.thickness === "number" ? outline.thickness : 1;
+
+        if (outline.useDispositionColor) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.outline as any).color = this.getDispositionColor();
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.outline as any).color = typeof outline.color === "string" ? outline.color : "FFFFFF";
+        }
+      }
+    }
+
+    if (!config.effects?.outline) this.outline.enabled = false;
+    if (!config?.effects?.glow) this.glow.enabled = false;
 
     return this;
   }
@@ -53,7 +115,29 @@ export class Nameplate {
         x: this.padding.x,
         y: this.padding.y
       },
-      style: this.serializeStyle()
+      effects: {
+        glow: {
+          enabled: this.glow.enabled,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          color: (this.glow as any).color as string,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          innerStrength: (this.glow as any).innerStrength as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          outerStrength: (this.glow as any).outerStrength as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          alpha: (this.glow as any).alpha as number
+        },
+        outline: {
+          enabled: this.outline.enabled,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          color: (this.outline as any).color as string,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          alpha: (this.outline as any).alpha as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          thickness: (this.outline as any).thickness as number
+        }
+      },
+      style: this.serializeStyle(),
     }
   }
 
@@ -113,7 +197,21 @@ export class Nameplate {
   public display: NameplateDisplay = "default";
 
   public destroy() {
-    if (!this.object.destroyed && this.token.nameplate !== this.object) this.object.destroy();
+    if (this.object) {
+
+      if (Array.isArray(this.object.filters)) {
+        for (const filter of this.object.filters)
+          filter.destroy();
+        this.object.filters = [];
+      }
+
+      if (!this.object.destroyed && this.token.nameplate !== this.object)
+        this.object.destroy()
+
+
+    }
+
+
   }
 
   public refreshText() {
@@ -134,5 +232,9 @@ export class Nameplate {
 
     if (typeof arg === "string") this.text = arg;
     this.object.style.wordWrap = true;
+
+    this.object.filters = [this.glow, this.outline];
+    this.glow.enabled = false;
+    this.outline.enabled = false;
   }
 }

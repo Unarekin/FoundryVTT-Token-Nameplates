@@ -34,7 +34,24 @@ export const DefaultNameplate: SerializedNameplate = {
   angle: 0,
   alpha: 1,
   // style: CONFIG.canvasTextStyle as unknown as Record<string, unknown>
-  style: {}
+  style: {},
+  effects: {
+    glow: {
+      enabled: false,
+      useDispositionColor: false,
+      alpha: 1,
+      innerStrength: 0,
+      outerStrength: 4,
+      color: "#FFFFFF"
+    },
+    outline: {
+      enabled: false,
+      useDispositionColor: false,
+      alpha: 1,
+      color: "#FFFFFF",
+      thickness: 1
+    }
+  }
 }
 
 Hooks.once("ready", () => {

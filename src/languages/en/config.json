@@ -59,6 +59,44 @@
           "LABEL": "Size"
         }
       },
+      "EFFECTS": {
+        "ALPHA": {
+          "LABEL": "Alpha",
+          "HINT": "Level of transparency for the effect"
+        },
+        "USEDISPOSITIONCOLOR": {
+          "LABEL": "Use Disposition Color",
+          "HINT": "Will color this effect based on the token's disposition (hostile, neutral, etc.)"
+        },
+        "COLOR": {
+          "LABEL": "Color",
+          "HINT": "The effect's color"
+        },
+        "OUTLINE": {
+          "ENABLE": {
+            "LABEL": "Enable Outline",
+            "HINT": "Add an outline to the nameplate"
+          },
+          "THICKNESS": {
+            "LABEL": "Thickness",
+            "HINT": "The thickness of the outline"
+          }
+        },
+        "GLOW": {
+          "ENABLE": {
+            "LABEL": "Enable Glow",
+            "HINT": "Add a glow effect to the nameplate"
+          },
+          "INNER": {
+            "LABEL": "Inner Strength",
+            "HINT": "Strength of the glow inward from the edge of the sprite"
+          },
+          "OUTER": {
+            "LABEL": "Outer Strength",
+            "HINT": "Strength of the glow outward from the edge of the sprite"
+          }
+        }
+      },
       "HEADER": "Nameplates",
       "IMPORT": {
         "HINT": "Import JSON configuration",
@@ -93,7 +131,10 @@
       },
       "TABS": {
         "BASICS": "Basics",
-        "FONT": "Font"
+        "FONT": "Font",
+        "EFFECTS": "Effects",
+        "OUTLINE": "Outline",
+        "GLOW": "Glow"
       },
       "TITLE": "Configure Nameplate",
       "TOOLTIPS": {

@@ -49,6 +49,29 @@ export interface SerializedNameplate {
   angle: number;
   alpha: number;
   display: NameplateDisplay;
+  effects: {
+    glow?: NameplateGlowEffect;
+    outline?: NameplateOutlineEffect;
+  }
+}
+
+export interface NameplateEffect {
+  enabled: boolean;
+}
+
+export interface NameplateGlowEffect extends NameplateEffect {
+  color: string;
+  useDispositionColor: boolean;
+  alpha: number;
+  innerStrength: number;
+  outerStrength: number;
+}
+
+export interface NameplateOutlineEffect extends NameplateEffect {
+  color: string;
+  useDispositionColor: boolean;
+  alpha: number;
+  thickness: number;
 }
 
 export interface NameplateConfiguration {

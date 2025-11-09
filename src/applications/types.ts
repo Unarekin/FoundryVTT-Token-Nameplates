@@ -2,6 +2,7 @@ import { SerializedNameplate, NameplatePosition, NameplateDisplay, NameplateConf
 
 export interface NameplateConfigContext extends foundry.applications.api.ApplicationV2.RenderContext {
   tabs?: Record<string, foundry.applications.api.ApplicationV2.Tab>;
+  subtabs: Record<string, foundry.applications.api.ApplicationV2.Tab>;
   buttons: foundry.applications.api.ApplicationV2.FormFooterButton[];
   idPrefix: string;
   object: TokenDocument | Actor;

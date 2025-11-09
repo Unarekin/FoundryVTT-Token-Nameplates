@@ -1,0 +1,37 @@
+<div class="tab {{subtab.cssClass}}{{#if subtab.active}} active{{/if}}" data-tab="glow" data-group="effects">
+  <div class="form-group">
+    <label for="{{idPrefix}}-glow-enable">{{localize "NAMEPLATES.CONFIG.EFFECTS.GLOW.ENABLE.LABEL"}}</label>
+    <input type="checkbox" id="{{idPrefix}}-glow-enable" name="effects.glow.enabled" {{checked effect.enabled}}>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.GLOW.ENABLE.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-glow-disposition-color">{{localize "NAMEPLATES.CONFIG.EFFECTS.USEDISPOSITIONCOLOR.LABEL"}}</label>
+    <input type="checkbox" id="{{idPRefix}}-glow-disposition-color" name="effects.glow.useDispositionColor" {{checked effect.useDispositionColor}}>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.USEDISPOSITIONCOLOR.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-glow-color">{{localize "NAMEPLATES.CONFIG.EFFECTS.COLOR.LABEL"}}</label>
+    <color-picker name="effects.glow.color" id="{{idPrefix}}-glow-color" value="{{effect.color}}"></color-picker>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.COLOR.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-glow-alpha">{{localize "NAMEPLATES.CONFIG.EFFECTS.ALPHA.LABEL"}}</label>
+    <range-picker min="0" max="1" step=".01" value="{{effect.alpha}}" id="{{idPrefix}}-glow-alpha" name="effects.glow.alpha"></range-picker>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.ALPHA.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-glow-innerStrength">{{localize "NAMEPLATES.CONFIG.EFFECTS.GLOW.INNER.LABEL"}}</label>
+    <input type="number" min="0" step="1" value="{{effect.innerStrength}}" id="{{idPrefix}}-glow-innerStrength" name="effects.glow.innerStrength">
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.GLOW.INNER.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-glow-outerStrength">{{localize "NAMEPLATES.CONFIG.EFFECTS.GLOW.OUTER.LABEL"}}</label>
+    <input type="number" min="0" step="1" value="{{effect.outerStrength}}" id="{{idPrefix}}-glow-outerStrength" name="effects.glow.outerStrength">
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.GLOW.OUTER.HINT"}}</p>
+  </div>
+</div>

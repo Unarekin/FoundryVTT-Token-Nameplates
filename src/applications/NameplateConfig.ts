@@ -1,6 +1,7 @@
 import { NameplateConfigContext, NameplateConfigConfiguration } from "./types";
 import { DeepPartial, SerializedNameplate } from "../types";
 import { generateDisplaySelectOptions, generateFontSelectOptions } from "./functions";
+import { getDefaultNameplate } from "functions";
 
 export class NameplateConfigApplication extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2<NameplateConfigContext, NameplateConfigConfiguration>) {
 
@@ -43,8 +44,66 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     font: {
       template: `modules/${__MODULE_ID__}/templates/NameplateFont.hbs`
     },
+    effects: {
+      template: `modules/${__MODULE_ID__}/templates/NameplateEffects.hbs`,
+      templates: [
+        `modules/${__MODULE_ID__}/templates/NameplateEffects-Glow.hbs`,
+        `modules/${__MODULE_ID__}/templates/NameplateEffects-Outline.hbs`
+      ]
+    },
     footer: {
       template: `templates/generic/form-footer.hbs`
+    }
+  }
+
+  static TABS: Record<string, { tabs: foundry.applications.api.ApplicationV2.Tab[] }> = {
+    primary: {
+      tabs: [
+        {
+          id: "basics",
+          group: "primary",
+          label: "NAMEPLATES.CONFIG.TABS.BASICS",
+          active: true,
+          cssClass: "active",
+          icon: "fa-solid fa-cogs"
+        },
+        {
+          id: "font",
+          group: "primary",
+          label: "NAMEPLATES.CONFIG.TABS.FONT",
+          active: false,
+          cssClass: "",
+          icon: "fa-solid fa-paragraph"
+        },
+        {
+          id: "effects",
+          group: "primary",
+          label: "NAMEPLATES.CONFIG.TABS.EFFECTS",
+          active: false,
+          cssClass: "",
+          icon: "fa-solid fa-wand-magic-sparkles"
+        }
+      ]
+    },
+    effects: {
+      tabs: [
+        {
+          id: "outline",
+          group: "effects",
+          label: "NAMEPLATES.CONFIG.TABS.OUTLINE",
+          active: true,
+          cssClass: "active",
+          icon: "fa-solid fa-border-none"
+        },
+        {
+          id: "glow",
+          group: "effects",
+          label: "NAMEPLATES.CONFIG.TABS.GLOW",
+          active: false,
+          cssClass: "",
+          icon: "fa-solid fa-star"
+        }
+      ]
     }
   }
 
@@ -67,7 +126,11 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
 
 
   async Edit(config: SerializedNameplate): Promise<SerializedNameplate | undefined> {
-    this.#config = foundry.utils.deepClone(config);
+    this.#config = {
+      ...getDefaultNameplate(),
+      ...foundry.utils.deepClone(config)
+    } as SerializedNameplate;
+
     if (!this.rendered) await this.render(true);
 
     if (!this.#promise) {
@@ -149,29 +212,23 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
   }
 
 
+
+  protected async _preparePartContext(partId: string, context: NameplateConfigContext, options: foundry.applications.api.ApplicationV2.RenderOptions): Promise<NameplateConfigContext> {
+    const actual: NameplateConfigContext = await super._preparePartContext(partId, context, options);
+
+
+    if (NameplateConfigApplication.TABS[partId])
+      actual.subtabs = this._prepareTabs(partId);
+
+    return actual;
+  }
+
   protected async _prepareContext(options: foundry.applications.api.ApplicationV2.RenderOptions): Promise<NameplateConfigContext> {
     const context = await super._prepareContext(options);
 
-    context.tabs = {
-      basics: {
-        id: "basics",
-        group: "primary",
-        label: "NAMEPLATES.CONFIG.TABS.BASICS",
-        active: true,
-        cssClass: "active",
-        icon: "fa-solid fa-cogs"
-      },
-      font: {
-        id: "font",
-        group: "primary",
-        label: "NAMEPLATES.CONFIG.TABS.FONT",
-        active: false,
-        cssClass: "",
-        icon: "fa-solid fa-paragraph"
-      }
-    }
-
     if (this.#config) context.nameplate = foundry.utils.deepClone(this.#config);
+
+    context.tabs = this._prepareTabs("primary");
 
     context.positionSelect = {
       "top": "NAMEPLATES.CONFIG.POSITION.TOP",
@@ -181,7 +238,7 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     context.fontSelect = generateFontSelectOptions();
     context.displaySelect = generateDisplaySelectOptions();
 
-    context.idPrefix = this.#config?.id;
+    context.idPrefix = this.#config?.id ?? "";
 
     context.buttons = [
       { type: "button", icon: "fa-solid fa-times", label: "Cancel", action: "cancel" },
