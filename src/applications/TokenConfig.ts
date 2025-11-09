@@ -42,6 +42,13 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
         this.#flags.nameplates[index] = this.#flags.nameplates[index - 1];
         this.#flags.nameplates[index - 1] = nameplate;
+
+        const upper = this.#flags.nameplates.filter(plate => plate.position === "top");
+        const lower = this.#flags.nameplates.filter(plate => plate.position === "bottom");
+
+        upper.forEach((plate, i) => { plate.sort = i; });
+        lower.forEach((plate, i) => { plate.sort = i; });
+
         this.#hasChanges = true;
         await this.render();
       } catch (err) {
@@ -77,6 +84,12 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         const nameplate = this.#flags.nameplates[index];
         this.#flags.nameplates[index] = this.#flags.nameplates[index + 1];
         this.#flags.nameplates[index + 1] = nameplate;
+
+        const upper = this.#flags.nameplates.filter(plate => plate.position === "top");
+        const lower = this.#flags.nameplates.filter(plate => plate.position === "bottom");
+
+        upper.forEach((plate, i) => { plate.sort = i; });
+        lower.forEach((plate, i) => { plate.sort = i; });
         this.#hasChanges = true;
         await this.render();
       } catch (err) {

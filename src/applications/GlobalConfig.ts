@@ -173,6 +173,12 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
       const nameplate = this.#config.nameplates[index];
       this.#config.nameplates[index] = this.#config.nameplates[index - 1];
       this.#config.nameplates[index - 1] = nameplate;
+
+      const upper = this.#config.nameplates.filter(plate => plate.position === "top");
+      const lower = this.#config.nameplates.filter(plate => plate.position === "bottom");
+
+      upper.forEach((plate, i) => { plate.sort = i; });
+      lower.forEach((plate, i) => { plate.sort = i; });
       await this.render();
     } catch (err) {
       console.error(err);
@@ -212,6 +218,12 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
       const nameplate = this.#config.nameplates[index];
       this.#config.nameplates[index] = this.#config.nameplates[index + 1];
       this.#config.nameplates[index + 1] = nameplate;
+
+      const upper = this.#config.nameplates.filter(plate => plate.position === "top");
+      const lower = this.#config.nameplates.filter(plate => plate.position === "bottom");
+
+      upper.forEach((plate, i) => { plate.sort = i; });
+      lower.forEach((plate, i) => { plate.sort = i; });
       await this.render();
     } catch (err) {
       console.error(err);
