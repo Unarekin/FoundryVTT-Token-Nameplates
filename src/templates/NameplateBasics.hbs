@@ -1,0 +1,95 @@
+<div class="tab active {{tab.cssClass}}" data-tab="basics" data-group="primary">
+  <input type="hidden" name="id" value="{{nameplate.id}}" />
+  <input type="hidden" name="sort" value="{{nameplate.sort}}" />
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-value">{{localize
+        "NAMEPLATES.CONFIG.VALUE.LABEL"
+      }}</label>
+    <input
+      type="text"
+      name="value"
+      id="{{idPrefix}}-value"
+      value="{{nameplate.value}}"
+      data-role="value-input"
+    />
+
+    </datalist>
+    <p class="hint">{{{localize "NAMEPLATES.CONFIG.VALUE.HINT"}}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-display">{{localize "NAMEPLATES.CONFIG.DISPLAY.LABEL"}}</label>
+    <select name="display" id="{{idPrefix}}-display">
+      {{selectOptions displaySelect selected=nameplate.display localize=true}}
+    </select>
+
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.DISPLAY.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-position">{{localize
+        "NAMEPLATES.CONFIG.POSITION.LABEL"
+      }}</label>
+    <select name="position" id="{{idPrefix}}-position">
+      {{selectOptions positionSelect selected=nameplate.position localize=true}}
+    </select>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.POSITION.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-angle">{{localize
+        "NAMEPLATES.CONFIG.ANGLE.LABEL"
+      }}</label>
+    <range-picker
+      name="angle"
+      id="{{idPrefix}}-angle"
+      value="{{nameplate.angle}}"
+      min="0"
+      max="360"
+      step="1"
+    ></range-picker>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.ANGLE.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-alpha">{{localize
+        "NAMEPLATES.CONFIG.ALPHA.LABEL"
+      }}</label>
+    <range-picker
+      name="alpha"
+      id="{{idPrefix}}-alpha"
+      min="0"
+      max="1"
+      value="{{nameplate.alpha}}"
+    ></range-picker>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.ALPHA.HINT"}}</p>
+  </div>
+
+  <div class="form-group slim">
+    <label>{{localize "NAMEPLATES.CONFIG.PADDING.LABEL"}}</label>
+    <div class="form-fields">
+      <label for="{{idPrefix}}-padX">{{localize
+          "NAMEPLATES.CONFIG.PADDING.X"
+        }}</label>
+      <input
+        type="number"
+        name="padding.x"
+        id="{{idPrefix}}-padX"
+        value="{{nameplate.padding.x}}"
+        step="1"
+      />
+      <label for="{{idPrefix}}-padY">{{localize
+          "NAMEPLATES.CONFIG.PADDING.Y"
+        }}</label>
+      <input
+        type="number"
+        name="padding.y"
+        id="{{idPrefix}}-padY"
+        value="{{nameplate.padding.y}}"
+        step="1"
+      />
+    </div>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.PADDING.HINT"}}</p>
+  </div>
+</div>

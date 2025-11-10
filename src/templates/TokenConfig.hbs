@@ -1,0 +1,113 @@
+<div class="tab{{#if tab.active}} active{{/if}} token-nameplates-config" data-group="sheet" data-tab="nameplates" data-application-part="nameplates" style="overflow-y:auto;overflow-x:hidden">
+  {{#with nameplates}}
+    <div class="form-group">
+      {{#if ../globalConfig }}
+        <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLEGLOBAL.LABEL"}}</label>
+        <input type="checkbox" id="{{idPrefix}}-nameplates-enabled" name="nameplates.enabled" {{checked enabled}}>
+        <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLEGLOBAL.HINT"}}</p>
+      {{else}}
+        <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLE.LABEL"}}</label>
+        <input type="checkbox" id="{{idPrefix}}-nameplates-enabled" name="nameplates.enabled" {{checked enabled}}>
+        <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLE.HINT"}}</p>
+      {{/if}}
+    </div>
+
+    <div class="form-group">
+      <button type="button" data-action="revertNameplates">{{localize "NAMEPLATES.CONFIG.REVERT.LABEL"}}</button>
+      <p class="hint">{{localize "NAMEPLATES.CONFIG.REVERT.HINT"}}</p>
+    </div>
+    
+    <div class="form-group">
+      <div class="flexrow">
+        <div class="flex1">
+          <label for="{{idPrefix}}-nameplates-export">{{localize "NAMEPLATES.CONFIG.EXPORT.LABEL"}}</label>
+        </div>
+        <div class="flex0">
+          <a data-action="" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EXPORT"}}" data-role="export-nameplates">
+            <i class="fa-solid fa-download"></i>
+          </a>
+        </div>
+      </div>
+      <p class="hint">{{localize "NAMEPLATES.CONFIG.EXPORT.HINT"}}</p>
+    </div>
+
+    <div class="form-group">
+      <div class="flexrow">
+        <div class="flex1">
+          <label for="{{idPrefix}}-nameplates-import">{{localize "NAMEPLATES.CONFIG.IMPORT.LABEL"}}</label>
+        </div>
+        <div class="flex0">
+          <a data-role="import-nameplates" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.IMPORT"}}">
+            <i class="fa-solid fa-upload"></i>
+          </a>
+        </div>
+      </div>
+      <p class="hint">{{localize "NAMEPLATES.CONFIG.IMPORT.HINT"}}</p>
+    </div>
+
+    <div class="flexrow">
+      <div class="flex1">
+        <h4 class="token-nameplate-list__header">{{localize "NAMEPLATES.CONFIG.HEADER"}}</h4>
+      </div>
+      <div class="flex0">
+        <a data-action="addNameplate" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.ADD"}}">
+          <i class="fa-solid fa-plus"></i>
+        </a>
+      </div>
+    </div>
+    {{localize "NAMEPLATES.CONFIG.UPPER" }}
+    <div class="token-nameplate-list" data-role="nameplate-list">
+      <div class="token-nameplate-list__col"></div>
+      <div class="token-nameplate-list__col">{{localize "NAMEPLATES.CONFIG.VALUE.LABEL"}}</div>
+      <div class="token-nameplate-list__col">{{localize "NAMEPLATES.CONFIG.CURRENT.LABEL"}}</div>
+      <div class="token-nameplate-list__col"></div>
+      {{#each upperNameplates as |nameplate i|}}
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="moveNameplateUp" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.UP"}}"{{#if @first}}  class="token-nameplate-list__col--disabled"{{/if}}>
+            <i class="fa-solid fa-caret-up"></i>
+          </a>
+          <a data-action="moveNameplateDown" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.DOWN"}}"{{#if @last}}  class="token-nameplate-list__col--disabled"{{/if}}>
+            <i class="fa-solid fa-caret-down"></i>
+          </a>
+        </div>
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}">{{nameplate.value}}</a>
+        </div>
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}">{{nameplate.actualValue}}</a>
+        </div>
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}"><i  class="fa-solid fa-gears"></i></a>
+          <a data-action="removeNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.REMOVE"}}"><i class="fa-solid fa-trash"></i></a>
+        </div>
+      {{/each}}
+    </div>
+    {{localize "NAMEPLATES.CONFIG.LOWER" }}
+    <div class="token-nameplate-list" data-role="nameplate-list">
+      <div class="token-nameplate-list__col"></div>
+      <div class="token-nameplate-list__col">{{localize "NAMEPLATES.CONFIG.VALUE.LABEL"}}</div>
+      <div class="token-nameplate-list__col">{{localize "NAMEPLATES.CONFIG.CURRENT.LABEL"}}</div>
+      <div class="token-nameplate-list__col"></div>
+      {{#each lowerNameplates as |nameplate i|}}
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="moveNameplateUp" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.UP"}}"{{#if @first}}  class="token-nameplate-list__col--disabled"{{/if}}>
+            <i class="fa-solid fa-caret-up"></i>
+          </a>
+          <a data-action="moveNameplateDown" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.DOWN"}}"{{#if @last}}  class="token-nameplate-list__col--disabled"{{/if}}>
+            <i class="fa-solid fa-caret-down"></i>
+          </a>
+        </div>
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}">{{nameplate.value}}</a>
+        </div>
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}">{{nameplate.actualValue}}</a>
+        </div>
+        <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
+          <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}"><i  class="fa-solid fa-gears"></i></a>
+          <a data-action="removeNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.REMOVE"}}"><i class="fa-solid fa-trash"></i></a>
+        </div>
+      {{/each}}
+    </div>
+  {{/with}}
+</div>

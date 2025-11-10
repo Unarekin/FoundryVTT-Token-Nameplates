@@ -1,7 +1,7 @@
 {
-  "id": "module-template",
-  "title": "Module Template",
-  "description": "A module template, this should have been changed",
+  "id": "token-nameplates",
+  "title": "Token Nameplates",
+  "description": "Add more customization options for your tokens' nameplates",
   "version": "#{VERSION}#",
   "library": "false",
   "compatibility": {
@@ -19,11 +19,20 @@
   "socket": true,
   "relationships": {
     "systems": [],
-    "requires": []
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "manifest": "https://github.com/ruipin/fvtt-lib-wrapper/releases/download/v1.13.4.0/module.json",
+        "compatibility": {
+          "verified": "1.13.4.0"
+        }
+      }
+    ]
   },
   "esmodules": ["module.js"],
-  "scripts": [],
-  "styles": ["styles/module.css"],
+  "scripts": ["vendor/pixi-filters.min.js", "vendor/jquery-ui.min.js"],
+  "styles": ["styles/module.css", "vendor/jquery-ui.min.css"],
   "languages": [
     {
       "lang": "en",

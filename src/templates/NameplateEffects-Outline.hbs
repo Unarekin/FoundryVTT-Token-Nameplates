@@ -1,0 +1,31 @@
+<div class="tab {{tab.cssClass}}{{#if subtab.active}} active{{/if}}" data-tab="outline" data-group="effects">
+  <div class="form-group">
+    <label for="{{idPrefix}}-outline-enable">{{localize "NAMEPLATES.CONFIG.EFFECTS.OUTLINE.ENABLE.LABEL"}}</label>
+    <input type="checkbox" id="{{idPrefix}}-outline-enable" name="effects.outline.enabled" {{checked effect.enabled}}>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.OUTLINE.ENABLE.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-outline-disposition-color">{{localize "NAMEPLATES.CONFIG.EFFECTS.USEDISPOSITIONCOLOR.LABEL"}}</label>
+    <input type="checkbox" id="{{idPRefix}}-outline-disposition-color" name="effects.outline.useDispositionColor" {{checked effect.useDispositionColor}}>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.USEDISPOSITIONCOLOR.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-outline-color">{{localize "NAMEPLATES.CONFIG.EFFECTS.COLOR.LABEL"}}</label>
+    <color-picker name="effects.outline.color" id="{{idPrefix}}-outline-color" value="{{effect.color}}"></color-picker>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.COLOR.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-outline-alpha">{{localize "NAMEPLATES.CONFIG.EFFECTS.ALPHA.LABEL"}}</label>
+    <range-picker min="0" max="1" step=".01" value="{{effect.alpha}}" id="{{idPrefix}}-outline-alpha" name="effects.outline.alpha"></range-picker>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.ALPHA.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
+    <label for="{{idPrefix}}-outline-thickness">{{localize "NAMEPLATES.CONFIG.EFFECTS.OUTLINE.THICKNESS.LABEL"}}</label>
+    <input type="number" min="0" step="1" value="{{effect.thickness}}" id="{{idPrefix}}-outline-thickness" name="effects.outline.thickness">
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.EFFECTS.OUTLINE.THICKNESS.HINT"}}</p>
+  </div>
+</div>

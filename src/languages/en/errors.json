@@ -1,0 +1,8 @@
+{
+  "NAMEPLATES": {
+    "ERRORS": {
+      "MISSINGNAMEPLATEID": "Nameplate ID missing!",
+      "NAMEPLATENOTFOUND": "Nameplate not found!"
+    }
+  }
+}

@@ -1,9 +1,16 @@
-declare const __DEV__: boolean;
-declare const __MODULE_TITLE__: string;
-// declare const __MODULE_ID__: string;
-const __MODULE_ID__ = "module-template";
-declare const __MODULE_VERSION__: string;
+import { TokenNameplates } from "types";
+
+declare global {
+
+  declare const __DEV__: boolean;
+  declare const __MODULE_TITLE__: string;
+  // declare const __MODULE_ID__: string;
+  const __MODULE_ID__ = "token-nameplates";
+  declare const __MODULE_VERSION__: string;
 
 
-declare module '*.scss';
+  declare module '*.scss';
+  declare const libWrapper: any;
 
+  declare var TokenNameplates: TokenNameplates;
+}
