@@ -1,4 +1,3 @@
-[![GitHub License](https://img.shields.io/github/license/Unarekin/FoundryVTT-Token-Nameplates)](https://raw.githubusercontent.com/Unarekin/FoundryVTT-Token-Nameplates/refs/heads/master/LICENSE?token=GHSAT0AAAAAACYQQTQK6ODLNX6QMRS6G7GWZY22EZQ)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/Unarekin/FoundryVTT-Token-Nameplates)
 ![Supported Foundry Version](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fversion%3Fstyle%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FUnarekin%2FFoundryVTT-Token-Nameplates%2Frefs%2Fheads%2Fmain%2Fmodule.json)
 ![Supported Game Systems](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Dfull%26showVersion%3D1%26style%3Dflat%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FUnarekin%2FFoundryVTT-Token-Nameplates%2Frefs%2Fheads%2Fmain%2Fmodule.json)
@@ -13,7 +12,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
   - [Global Configurations](#global-configurations)
-  - [Value Interpolation](#value-interpolation)
+  - [String Interpolation](#string-interpolation)
 - [Support](#support)
 
 
