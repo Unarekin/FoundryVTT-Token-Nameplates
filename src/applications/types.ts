@@ -12,9 +12,9 @@ export interface NameplateConfigContext extends foundry.applications.api.Applica
   displaySelect: Record<NameplateDisplay, string>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface NameplateConfigConfiguration extends foundry.applications.api.ApplicationV2.Configuration {
 
+export interface NameplateConfigConfiguration extends foundry.applications.api.ApplicationV2.Configuration {
+  actorType?: string;
 }
 
 

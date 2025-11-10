@@ -154,7 +154,9 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         const nameplate = this.#flags.nameplates.find(item => item.id === id);
         if (!nameplate) throw new LocalizedError("NAMEPLATENOTFOUND");
 
-        const edited = await NameplateConfigApplication.Edit(nameplate);
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        const edited = await NameplateConfigApplication.Edit(nameplate, (this as any).token);
 
         if (edited) {
           edited.style = serializeStyle(edited.style as unknown as PIXI.TextStyle);

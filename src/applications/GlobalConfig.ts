@@ -146,7 +146,7 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
       const nameplate = this.#config.nameplates.find(item => item.id === id);
       if (!nameplate) throw new LocalizedError("NAMEPLATENOTFOUND");
 
-      const edited = await NameplateConfigApplication.Edit(nameplate);
+      const edited = await NameplateConfigApplication.Edit(nameplate, undefined, this.actorType);
 
       if (edited) {
         edited.style = serializeStyle(edited.style as unknown as PIXI.TextStyle);

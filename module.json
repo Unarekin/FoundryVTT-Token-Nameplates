@@ -19,11 +19,20 @@
   "socket": true,
   "relationships": {
     "systems": [],
-    "requires": []
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "manifest": "https://github.com/ruipin/fvtt-lib-wrapper/releases/download/v1.13.2.0/module.json",
+        "compatibility": {
+          "verified": "1.13.2.0"
+        }
+      }
+    ]
   },
   "esmodules": ["module.js"],
-  "scripts": ["vendor/pixi-filters.min.js"],
-  "styles": ["styles/module.css"],
+  "scripts": ["vendor/pixi-filters.min.js", "vendor/jquery-ui.min.js"],
+  "styles": ["styles/module.css", "vendor/jquery-ui.min.css"],
   "languages": [
     {
       "lang": "en",

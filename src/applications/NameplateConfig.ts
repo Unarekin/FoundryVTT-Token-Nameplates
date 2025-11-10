@@ -1,7 +1,11 @@
+/// <reference types="jquery" />
+/// <reference types="jqueryui" />
+
+
 import { NameplateConfigContext, NameplateConfigConfiguration } from "./types";
 import { DeepPartial, SerializedNameplate } from "../types";
 import { generateDisplaySelectOptions, generateFontSelectOptions } from "./functions";
-import { getDefaultNameplate } from "functions";
+import { getAutocompleteValue, getDefaultNameplate, getInterpolationData, getKeys } from "functions";
 
 export class NameplateConfigApplication extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2<NameplateConfigContext, NameplateConfigConfiguration>) {
 
@@ -11,6 +15,7 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
   // eslint-disable-next-line no-unused-private-class-members
   #reject: ((err: Error) => void) | undefined = undefined;
   #submitted = false;
+  #actorType: string;
 
   public static DEFAULT_OPTIONS: DeepPartial<foundry.applications.api.ApplicationV2.Configuration> = {
     window: {
@@ -119,8 +124,8 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     this.#submitted = true;
   }
 
-  static async Edit(config: SerializedNameplate): Promise<SerializedNameplate | undefined> {
-    const app = new NameplateConfigApplication();
+  static async Edit(config: SerializedNameplate, obj?: TokenDocument | Actor, actorType?: string): Promise<SerializedNameplate | undefined> {
+    const app = new NameplateConfigApplication(obj, { actorType });
     return app.Edit(config);
   }
 
@@ -193,6 +198,43 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
       select.addEventListener("change", () => { select.style.fontFamily = select.value; });
     }
 
+    const valueInput = this.element.querySelector(`input[name="value"]`)
+    if (valueInput instanceof HTMLInputElement) {
+
+      let suggestionKeys: string[] = [];
+      if (this.object)
+        suggestionKeys = Object.keys(getInterpolationData(this.object));
+      else if (this.#actorType)
+        suggestionKeys = getKeys(this.#actorType);
+
+      $(valueInput).autocomplete({
+        // appendTo: this.element,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        focus: (e: JQueryEventObject, ui: JQueryUI.AutocompleteUIParams) => {
+          e.preventDefault();
+        },
+        select: (e: JQueryEventObject, ui: JQueryUI.AutocompleteUIParams) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const startIndex = valueInput.value.lastIndexOf("{");
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          valueInput.setRangeText(`${ui.item.value}}`, startIndex + 1, valueInput.value.length, "end")
+        },
+        source: (req: { term: string }, res: ((values: string[]) => void)) => {
+          const value = getAutocompleteValue(req.term);
+
+          if (value) {
+            // const suggestions = suggestionKeys.filter(key => key.toLowerCase().startsWith(value.toLowerCase()));
+            const regex = new RegExp($.ui.autocomplete.escapeRegex(value), "i");
+            res($.grep(suggestionKeys, item => regex.test(item)));
+          } else {
+            res([]);
+          }
+        }
+      });
+    }
+
     this.renderPreview();
   }
 
@@ -248,7 +290,8 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     return context;
   }
 
-  constructor(public readonly object?: TokenDocument | Actor, options?: DeepPartial<NameplateConfigConfiguration>) {
+  constructor(public readonly object?: TokenDocument | Actor | foundry.data.PrototypeToken, options?: DeepPartial<NameplateConfigConfiguration>) {
     super(options);
+    if (options?.actorType) this.#actorType = options.actorType;
   }
 }

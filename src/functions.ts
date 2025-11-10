@@ -20,18 +20,41 @@ export function interpolate(text: string, data: Record<string, unknown>, strip =
   })
 }
 
+function getSchemaKeys(model: typeof foundry.abstract.DataModel): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const obj: foundry.abstract.DataModel.Any = new (model as any)();
+  console.log("Getting schema:", obj);
+  return Object.keys(foundry.utils.flattenObject(obj));
+}
+
+export function getKeys(actorType: string): string[] {
+  const keys = [];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  keys.push(...getSchemaKeys(TokenDocument as any));
+  if (CONFIG.Actor.dataModels[actorType]) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const actorKeys = getSchemaKeys(CONFIG.Actor.dataModels[actorType] as any)
+    // keys.push(...actorKeys.map(key => `actor.system.${key}`));
+    keys.push(...actorKeys.map(key => `system.${key}`));
+  }
+  keys.push("tooltip", "flags");
+  return keys.filter((key, i, arr) => arr.indexOf(key) === i);
+}
+
 export function getInterpolationData(doc: TokenDocument): Record<string, unknown> {
-  return foundry.utils.flattenObject(
-    foundry.utils.mergeObject(doc.toObject(), {
-      actor: doc.actor?.toObject() ?? {},
-      tooltip: (doc.object?.tooltip?.text ?? ""),
-      flags: foundry.utils.mergeObject({
-        ...(doc.actor?.flags ?? {}),
-        ...(doc.flags ?? {})
-      }),
-      system: doc.actor?.system ?? {}
-    })
-  ) as Record<string, unknown>
+
+  const data = foundry.utils.flattenObject({
+    ...doc.toObject(),
+    tooltip: (doc.object?.tooltip?.text ?? ""),
+    flags: foundry.utils.mergeObject({
+      ...(doc.actor?.flags ?? {}),
+      ...(doc.flags ?? {})
+    }),
+    system: foundry.utils.flattenObject(doc.actor?.system ?? {})
+    // ...(doc.actor?.toObject() ?? {})
+  }) as Record<string, unknown>;
+
+  return data;
 }
 
 
@@ -144,3 +167,18 @@ export function uploadJSON<t = any>(): Promise<t> {
     file.click();
   })
 }
+
+export function getAutocompleteValue(text: string): string {
+  const lastOpen = text.lastIndexOf("{");
+  const lastClose = text.lastIndexOf("}");
+  if (lastClose >= lastOpen) return "";
+
+  const split = text.split("{");
+  return split[split.length - 1];
+}
+
+export function getAutocompleteSuggestions(token: TokenDocument | Actor, text: string): string[] {
+  return Object.keys(getInterpolationData(token))
+    .filter(key => key.startsWith(text));
+}
+
