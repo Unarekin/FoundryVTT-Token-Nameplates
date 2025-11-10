@@ -16,7 +16,7 @@ export function stripHTML(val: string): string {
 export function interpolate(text: string, data: Record<string, unknown>, strip = false): string {
   const reg = /{[^}]+}/g;
   return (strip ? stripHTML(text) : text).replace(reg, k => {
-    return data[k.slice(1, -1)] as string;
+    return (data[k.slice(1, -1)] ?? "") as string;
   })
 }
 
