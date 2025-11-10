@@ -23,7 +23,6 @@ export function interpolate(text: string, data: Record<string, unknown>, strip =
 function getSchemaKeys(model: typeof foundry.abstract.DataModel): string[] {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const obj: foundry.abstract.DataModel.Any = new (model as any)();
-  console.log("Getting schema:", obj);
   return Object.keys(foundry.utils.flattenObject(obj));
 }
 
