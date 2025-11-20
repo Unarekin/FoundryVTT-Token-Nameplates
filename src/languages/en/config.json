@@ -128,6 +128,7 @@
         "PASTED": "Configuration read from clipboard",
         "UPLOAD": "Upload JSON"
       },
+      "LEFT": "Left Nameplates",
       "LOWER": "Lower Nameplates",
       "PADDING": {
         "HINT": "Space above and to the left of the nameplate",
@@ -139,6 +140,7 @@
         "BOTTOM": "Bottom",
         "HINT": "Where to place the nameplate relative to the token",
         "LABEL": "Position",
+        "LEFT": "Left",
         "RIGHT": "Right",
         "TOP": "Top"
       },

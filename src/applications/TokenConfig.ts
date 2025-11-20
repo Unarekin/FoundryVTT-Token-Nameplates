@@ -364,6 +364,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         upperNameplates: this.nameplatesByPosition("top"),
         lowerNameplates: this.nameplatesByPosition("bottom"),
         rightNameplates: this.nameplatesByPosition("right"),
+        leftNameplates: this.nameplatesByPosition("left"),
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         idPrefix: (this as any).token instanceof foundry.canvas.placeables.Token ? (this as any).token.uuid.replaceAll(".", "-") : `prototype-${(this as any).actor.uuid.replaceAll(".", "-")}`,
         // idPrefix: (this as any).token.uuid.replaceAll(".", "-"),

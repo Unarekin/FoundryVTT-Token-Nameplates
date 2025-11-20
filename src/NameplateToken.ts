@@ -22,6 +22,7 @@ export class NameplateToken {
   private bottomContainer = new PIXI.Container();
   private topContainer = new PIXI.Container();
   private rightContainer = new PIXI.Container();
+  private leftContainer = new PIXI.Container();
 
   public readonly nameplates: Nameplate[] = [];
 
@@ -30,6 +31,8 @@ export class NameplateToken {
   public get bottomNameplates() { return this.nameplatesByPosition("bottom"); }
   public get topNameplates() { return this.nameplatesByPosition("top"); }
   public get rightNameplates() { return this.nameplatesByPosition("right"); }
+  public get leftNameplates() { return this.nameplatesByPosition("left"); }
+
   public get destroyed() { return this.#destroyed; }
 
   public get enabled() { return this.#enabled; }
@@ -142,6 +145,7 @@ export class NameplateToken {
         plate.style.wordWrap = true;
 
         if (plate.autoAnchor) plate.anchor.y = 0;
+        plate.y = y + plate.padding.y;
 
         switch (plate.align) {
           case "left":
@@ -158,6 +162,40 @@ export class NameplateToken {
             plate.x = width + 2 + ((width * 2.5) / 2);
             break;
         }
+        plate.x += plate.padding.x;
+        y += plate.height + 2 + plate.padding.y;
+      } else {
+        plate.object.visible = false;
+      }
+    }
+
+    const left = this.leftNameplates.sort((a, b) => a.sort - b.sort);
+    y = 0;
+    for (const plate of left) {
+      if (this.shouldDisplay(plate)) {
+        plate.object.visible = true;
+        plate.refreshText();
+        plate.style.wordWrapWidth = width * 2.5;
+        plate.style.wordWrap = true;
+
+        if (plate.autoAnchor) plate.anchor.y = 0;
+        plate.y = y + plate.padding.y;
+        switch (plate.align) {
+          case "left":
+            if (plate.autoAnchor) plate.anchor.x = 0;
+            plate.x = -(width * 2.5) - 2;
+            break;
+          case "right":
+          case "justify":
+            if (plate.autoAnchor) plate.anchor.x = 1;
+            plate.x = -2;
+            break;
+          default:
+            if (plate.autoAnchor) plate.anchor.x = 0.5;
+            plate.x = ((- (width * 2.5)) + plate.width / 2);
+            break;
+        }
+
         plate.x += plate.padding.x;
         y += plate.height + 2 + plate.padding.y;
       } else {
@@ -197,6 +235,7 @@ export class NameplateToken {
     if (this.topNameplates.length) this.topContainer.addChild(...this.topNameplates.map(plate => plate.object));
     if (this.bottomNameplates.length) this.bottomContainer.addChild(...this.bottomNameplates.map(plate => plate.object));
     if (this.rightNameplates.length) this.rightContainer.addChild(...this.rightNameplates.map(plate => plate.object));
+    if (this.leftNameplates.length) this.leftContainer.addChild(...this.leftNameplates.map(plate => plate.object));
 
     // Ensure properly positioned/sized
     this.refreshNameplates();
@@ -261,11 +300,13 @@ export class NameplateToken {
     this.topContainer.name = "Top Nameplates";
     this.bottomContainer.name = "Bottom Nameplates";
     this.rightContainer.name = "Right Nameplates";
+    this.leftContainer.name = "Left Nameplates";
 
     if (this.token?.object) {
       this.token.object.addChild(this.topContainer);
       this.token.object.addChild(this.bottomContainer);
       this.token.object.addChild(this.rightContainer);
+      this.token.object.addChild(this.leftContainer);
 
       if (this.token.object.nameplate) this.token.object.nameplate.renderable = false;
       if (this.token.object.tooltip) this.token.object.tooltip.renderable = false;
