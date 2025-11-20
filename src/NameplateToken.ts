@@ -69,6 +69,10 @@ export class NameplateToken {
 
     const bottom = this.bottomNameplates.sort((a, b) => a.sort - b.sort);
     let y = this.token.object.nameplate?.y ?? 0;
+
+
+    const plateWidth = width * 2.5;
+
     for (const plate of bottom) {
       if (this.shouldDisplay(plate)) {
         plate.object.visible = true;
@@ -76,7 +80,25 @@ export class NameplateToken {
         plate.style.wordWrapWidth = width * 2.5;
         plate.style.wordWrap = true;
         plate.y = y + plate.padding.y;
-        plate.x = ((width - plate.width) / 2) + plate.padding.x;
+        //plate.x = ((width - plate.width) / 2) + plate.padding.x;
+        switch (plate.align) {
+          case "left":
+            plate.anchor.x = 0;
+            plate.x = (width / 2) - (plateWidth / 2);
+            break;
+          case "right":
+            plate.anchor.x = 1;
+            plate.x = (width / 2) + (plateWidth / 2);
+            break;
+          case "justify":
+            plate.anchor.x = 0;
+            plate.x = (width / 2) - (plateWidth / 2);
+            break;
+          default:
+            plate.anchor.x = 0.5;
+            plate.x = width / 2;
+        }
+        plate.x += plate.padding.x;
         y += plate.height + 2 + plate.padding.x;
       } else {
         plate.object.visible = false;

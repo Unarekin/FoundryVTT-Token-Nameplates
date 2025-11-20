@@ -47,6 +47,7 @@ export interface SerializedNameplate {
   value: string;
   padding: { x: number; y: number };
   angle: number;
+  align: PIXI.TextStyleAlign;
   alpha: number;
   display: NameplateDisplay;
   effects: {
