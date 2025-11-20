@@ -77,9 +77,13 @@ export class Nameplate {
         if (glow.useDispositionColor) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.glow as any).color = this.getDispositionColor();
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.glow as any).useDispositionColor = true
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.glow as any).color = typeof glow.color === "string" ? glow.color : "FFFFFF";
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.glow as any).useDispositionColor = false;
         }
 
       }
@@ -94,9 +98,13 @@ export class Nameplate {
         if (outline.useDispositionColor) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.outline as any).color = this.getDispositionColor();
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.outline as any).useDispositionColor = true;
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.outline as any).color = typeof outline.color === "string" ? outline.color : "FFFFFF";
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.outline as any).useDispositionColor = false;
         }
       }
     }
@@ -122,6 +130,7 @@ export class Nameplate {
       alpha: this.alpha,
       display: this.display,
       autoAnchor: this.autoAnchor,
+      align: this.align,
       anchor: {
         x: this.anchor.x,
         y: this.anchor.y
@@ -140,7 +149,9 @@ export class Nameplate {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           outerStrength: (this.glow as any).outerStrength as number,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          alpha: (this.glow as any).alpha as number
+          alpha: (this.glow as any).alpha as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          useDispositionColor: (this.glow as any)?.useDispositionColor as boolean ?? false
         },
         outline: {
           enabled: this.outline.enabled,
@@ -149,7 +160,9 @@ export class Nameplate {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           alpha: (this.outline as any).alpha as number,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          thickness: (this.outline as any).thickness as number
+          thickness: (this.outline as any).thickness as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          useDispositionColor: (this.outline as any)?.useDispositionColor as boolean ?? false
         }
       },
       style: this.serializeStyle(),
