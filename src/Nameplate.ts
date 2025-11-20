@@ -16,6 +16,10 @@ export class Nameplate {
   public get autoAnchor() { return this.#autoAnchor; }
   public set autoAnchor(val) { this.#autoAnchor = val; }
 
+  #fontDispositionColor = false;
+  public get fontDispositionColor() { return this.#fontDispositionColor; }
+  public set fontDispositionColor(val) { this.#fontDispositionColor = val; }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   public readonly glow = new (PIXI.filters as any).GlowFilter() as PIXI.Filter;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -60,6 +64,9 @@ export class Nameplate {
     this.anchor.x = config.anchor?.x ?? 0.5;
     this.anchor.y = config.anchor?.y ?? 0.5;
     this.autoAnchor = config.autoAnchor ? true : false;
+
+    this.fontDispositionColor = config.fontDispositionColor ? true : false;
+    if (this.fontDispositionColor) this.style.fill = this.getDispositionColor();
 
     this.align = config.align ?? "center";
 
@@ -130,6 +137,7 @@ export class Nameplate {
       alpha: this.alpha,
       display: this.display,
       autoAnchor: this.autoAnchor,
+      fontDispositionColor: this.fontDispositionColor,
       align: this.align,
       anchor: {
         x: this.anchor.x,

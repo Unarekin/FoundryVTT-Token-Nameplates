@@ -94,6 +94,10 @@
           "HINT": "",
           "LABEL": "Color"
         },
+        "DISPOSITIONCOLOR": {
+          "LABEL": "Use DispositionColor",
+          "HINT": "Will use the token's disposition to select font color."
+        },
         "DROPSHADOW": {
           "HINT": "",
           "LABEL": "Drop Shadow"
