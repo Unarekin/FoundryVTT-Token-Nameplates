@@ -126,7 +126,25 @@ export class NameplateToken {
         plate.style.wordWrapWidth = width * 2.5;
         plate.style.wordWrap = true;
         plate.y = y;
-        plate.x = ((width - plate.width) / 2) + plate.padding.x;
+
+        switch (plate.align) {
+          case "left":
+          case "justify":
+            if (plate.autoAnchor)
+              plate.anchor.x = 0;
+
+            plate.x = (width / 2) - (plateWidth / 2);
+            break;
+          case "right":
+            if (plate.autoAnchor)
+              plate.anchor.x = 1;
+            plate.x = (width / 2) + (plateWidth / 2);
+            break;
+          default:
+            if (plate.autoAnchor)
+              plate.anchor.x = 0.5;
+            plate.x = width / 2;
+        }
 
         plate.y = y + plate.padding.y;
         y += plate.height + 2 + plate.padding.y;
