@@ -30,6 +30,7 @@ export interface ActorTypeSelectionConfiguration extends foundry.applications.ap
 export interface GlobalNameplateConfig extends NameplateConfiguration {
   upperNameplates: SerializedNameplate[];
   lowerNameplates: SerializedNameplate[];
+  rightNameplates: SerializedNameplate[];
 }
 
 export interface GlobalConfigContext extends foundry.applications.api.ApplicationV2.RenderContext {

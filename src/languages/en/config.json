@@ -13,10 +13,6 @@
         "HINT": "Opacity of the nameplate",
         "LABEL": "Opacity"
       },
-      "AUTOANCHOR": {
-        "LABEL": "Automatically Calculate Anchor",
-        "HINT": "Will set the nameplate's anchor point based on its alignment"
-      },
       "ANCHOR": {
         "HINT": "Override the anchor position of this nameplate, for finer control over positioning",
         "LABEL": "Override Anchor",
@@ -26,6 +22,10 @@
       "ANGLE": {
         "HINT": "Angle at which to display this namplate.",
         "LABEL": "Angle"
+      },
+      "AUTOANCHOR": {
+        "HINT": "Will set the nameplate's anchor point based on its alignment",
+        "LABEL": "Automatically Calculate Anchor"
       },
       "CURRENT": {
         "HINT": "The current value after interpolation",
@@ -95,8 +95,8 @@
           "LABEL": "Color"
         },
         "DISPOSITIONCOLOR": {
-          "LABEL": "Use DispositionColor",
-          "HINT": "Will use the token's disposition to select font color."
+          "HINT": "Will use the token's disposition to select font color.",
+          "LABEL": "Use DispositionColor"
         },
         "DROPSHADOW": {
           "HINT": "",
@@ -139,6 +139,7 @@
         "BOTTOM": "Bottom",
         "HINT": "Where to place the nameplate relative to the token",
         "LABEL": "Position",
+        "RIGHT": "Right",
         "TOP": "Top"
       },
       "REMOVE": {
@@ -151,6 +152,7 @@
         "MESSAGE": "Are you sure you want to revert these settings back to default?",
         "TITLE": "Revert Settings"
       },
+      "RIGHT": "Right Nameplates",
       "TABS": {
         "BASICS": "Basics",
         "EFFECTS": "Effects",
