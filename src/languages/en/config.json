@@ -13,6 +13,16 @@
         "HINT": "Opacity of the nameplate",
         "LABEL": "Opacity"
       },
+      "AUTOANCHOR": {
+        "LABEL": "Automatically Calculate Anchor",
+        "HINT": "Will set the nameplate's anchor point based on its alignment"
+      },
+      "ANCHOR": {
+        "HINT": "Override the anchor position of this nameplate, for finer control over positioning",
+        "LABEL": "Override Anchor",
+        "X": "X",
+        "Y": "Y"
+      },
       "ANGLE": {
         "HINT": "Angle at which to display this namplate.",
         "LABEL": "Angle"

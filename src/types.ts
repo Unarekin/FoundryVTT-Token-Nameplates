@@ -50,6 +50,11 @@ export interface SerializedNameplate {
   align: PIXI.TextStyleAlign;
   alpha: number;
   display: NameplateDisplay;
+  autoAnchor: boolean;
+  anchor: {
+    x: number;
+    y: number;
+  }
   effects: {
     glow?: NameplateGlowEffect;
     outline?: NameplateOutlineEffect;

@@ -12,6 +12,10 @@ export class Nameplate {
 
   #text = "";
 
+  #autoAnchor = true;
+  public get autoAnchor() { return this.#autoAnchor; }
+  public set autoAnchor(val) { this.#autoAnchor = val; }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   public readonly glow = new (PIXI.filters as any).GlowFilter() as PIXI.Filter;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -52,6 +56,10 @@ export class Nameplate {
     this.alpha = config.alpha ?? 1;
     if (config.style) this.style = config.style;
     this.display = config.display ?? "default";
+
+    this.anchor.x = config.anchor?.x ?? 0.5;
+    this.anchor.y = config.anchor?.y ?? 0.5;
+    this.autoAnchor = config.autoAnchor ? true : false;
 
     this.align = config.align ?? "center";
 
@@ -113,6 +121,11 @@ export class Nameplate {
       angle: this.angle,
       alpha: this.alpha,
       display: this.display,
+      autoAnchor: this.autoAnchor,
+      anchor: {
+        x: this.anchor.x,
+        y: this.anchor.y
+      },
       padding: {
         x: this.padding.x,
         y: this.padding.y
