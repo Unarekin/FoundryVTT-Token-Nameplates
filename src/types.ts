@@ -24,7 +24,7 @@ export type DeepPartial<T> = T extends unknown
 export type AnyArray = readonly unknown[];
 export type AnyFunction = (arg0: never, ...args: never[]) => unknown;
 
-export const NameplatePositions = ["top", "bottom"] as const;
+export const NameplatePositions = ["top", "bottom", "right"] as const;
 export type NameplatePosition = typeof NameplatePositions[number];
 
 export interface TokenNameplates {

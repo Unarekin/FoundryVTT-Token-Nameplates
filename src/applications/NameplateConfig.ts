@@ -274,7 +274,8 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
 
     context.positionSelect = {
       "top": "NAMEPLATES.CONFIG.POSITION.TOP",
-      "bottom": "NAMEPLATES.CONFIG.POSITION.BOTTOM"
+      "bottom": "NAMEPLATES.CONFIG.POSITION.BOTTOM",
+      "right": "NAMEPLATES.CONFIG.POSITION.RIGHT"
     }
 
     context.alignSelect = {
