@@ -277,6 +277,13 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
       "bottom": "NAMEPLATES.CONFIG.POSITION.BOTTOM"
     }
 
+    context.alignSelect = {
+      "center": "NAMEPLATES.CONFIG.ALIGN.CENTER",
+      "left": "NAMEPLATES.CONFIG.ALIGN.LEFT",
+      "right": "NAMEPLATES.CONFIG.ALIGN.RIGHT",
+      "justify": "NAMEPLATES.CONFIG.ALIGN.JUSTIFY"
+    }
+
     context.fontSelect = generateFontSelectOptions();
     context.displaySelect = generateDisplaySelectOptions();
 

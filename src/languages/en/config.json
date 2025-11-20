@@ -1,6 +1,14 @@
 {
   "NAMEPLATES": {
     "CONFIG": {
+      "ALIGN": {
+        "CENTER": "Center",
+        "HINT": "Text alignment",
+        "JUSTIFY": "Justified",
+        "LABEL": "Alignment",
+        "LEFT": "Left",
+        "RIGHT": "Right"
+      },
       "ALPHA": {
         "HINT": "Opacity of the nameplate",
         "LABEL": "Opacity"
@@ -17,6 +25,44 @@
         "HINT": "",
         "LABEL": "Display Nameplate"
       },
+      "EFFECTS": {
+        "ALPHA": {
+          "HINT": "Level of transparency for the effect",
+          "LABEL": "Alpha"
+        },
+        "COLOR": {
+          "HINT": "The effect's color",
+          "LABEL": "Color"
+        },
+        "GLOW": {
+          "ENABLE": {
+            "HINT": "Add a glow effect to the nameplate",
+            "LABEL": "Enable Glow"
+          },
+          "INNER": {
+            "HINT": "Strength of the glow inward from the edge of the sprite",
+            "LABEL": "Inner Strength"
+          },
+          "OUTER": {
+            "HINT": "Strength of the glow outward from the edge of the sprite",
+            "LABEL": "Outer Strength"
+          }
+        },
+        "OUTLINE": {
+          "ENABLE": {
+            "HINT": "Add an outline to the nameplate",
+            "LABEL": "Enable Outline"
+          },
+          "THICKNESS": {
+            "HINT": "The thickness of the outline",
+            "LABEL": "Thickness"
+          }
+        },
+        "USEDISPOSITIONCOLOR": {
+          "HINT": "Will color this effect based on the token's disposition (hostile, neutral, etc.)",
+          "LABEL": "Use Disposition Color"
+        }
+      },
       "ENABLE": {
         "HINT": "Toggle on to enable Token Nameplates for this token.",
         "LABEL": "Enable Nameplates"
@@ -26,12 +72,12 @@
         "LABEL": "Enable Default Nameplates"
       },
       "EXPORT": {
-        "HINT": "Export JSON configuration",
-        "LABEL": "Export Configuration",
         "CLIPBOARD": "Copy to Clipboard",
-        "DOWNLOAD": "Download JSON",
         "COPIED": "Configuration copied to clipboard",
-        "DIALOGMESSAGE": "Copy the text below"
+        "DIALOGMESSAGE": "Copy the text below",
+        "DOWNLOAD": "Download JSON",
+        "HINT": "Export JSON configuration",
+        "LABEL": "Export Configuration"
       },
       "FONT": {
         "COLOR": {
@@ -59,52 +105,14 @@
           "LABEL": "Size"
         }
       },
-      "EFFECTS": {
-        "ALPHA": {
-          "LABEL": "Alpha",
-          "HINT": "Level of transparency for the effect"
-        },
-        "USEDISPOSITIONCOLOR": {
-          "LABEL": "Use Disposition Color",
-          "HINT": "Will color this effect based on the token's disposition (hostile, neutral, etc.)"
-        },
-        "COLOR": {
-          "LABEL": "Color",
-          "HINT": "The effect's color"
-        },
-        "OUTLINE": {
-          "ENABLE": {
-            "LABEL": "Enable Outline",
-            "HINT": "Add an outline to the nameplate"
-          },
-          "THICKNESS": {
-            "LABEL": "Thickness",
-            "HINT": "The thickness of the outline"
-          }
-        },
-        "GLOW": {
-          "ENABLE": {
-            "LABEL": "Enable Glow",
-            "HINT": "Add a glow effect to the nameplate"
-          },
-          "INNER": {
-            "LABEL": "Inner Strength",
-            "HINT": "Strength of the glow inward from the edge of the sprite"
-          },
-          "OUTER": {
-            "LABEL": "Outer Strength",
-            "HINT": "Strength of the glow outward from the edge of the sprite"
-          }
-        }
-      },
       "HEADER": "Nameplates",
       "IMPORT": {
+        "CLIPBOARD": "Import from Clipboard",
+        "DIALOGMESSAGE": "Paste the JSON below",
         "HINT": "Import JSON configuration",
         "LABEL": "Import Configuration",
-        "CLIPBOARD": "Import from Clipboard",
-        "UPLOAD": "Upload JSON",
-        "DIALOGMESSAGE": "Paste the JSON below",
-        "PASTED": "Configuration read from clipboard"
+        "PASTED": "Configuration read from clipboard",
+        "UPLOAD": "Upload JSON"
       },
       "LOWER": "Lower Nameplates",
       "PADDING": {
@@ -131,20 +139,20 @@
       },
       "TABS": {
         "BASICS": "Basics",
-        "FONT": "Font",
         "EFFECTS": "Effects",
-        "OUTLINE": "Outline",
-        "GLOW": "Glow"
+        "FONT": "Font",
+        "GLOW": "Glow",
+        "OUTLINE": "Outline"
       },
       "TITLE": "Configure Nameplate",
       "TOOLTIPS": {
         "ADD": "Add nameplate",
         "DOWN": "Move nameplate down",
         "EDIT": "Edit nameplate",
-        "REMOVE": "Remove nameplate",
-        "UP": "Move nameplate up",
         "EXPORT": "Export the current configuration as JSON",
-        "IMPORT": "Import a JSON configuration"
+        "IMPORT": "Import a JSON configuration",
+        "REMOVE": "Remove nameplate",
+        "UP": "Move nameplate up"
       },
       "TYPES": {
         "GLOBAL": "Global"

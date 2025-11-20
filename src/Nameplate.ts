@@ -53,6 +53,8 @@ export class Nameplate {
     if (config.style) this.style = config.style;
     this.display = config.display ?? "default";
 
+    this.align = config.align ?? "center";
+
     if (config.effects) {
       const { glow, outline } = config.effects;
       if (glow) {

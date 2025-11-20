@@ -10,6 +10,7 @@ export interface NameplateConfigContext extends foundry.applications.api.Applica
   fontSelect: Record<string, string>;
   positionSelect: Record<NameplatePosition, string>;
   displaySelect: Record<NameplateDisplay, string>;
+  alignSelect: Record<PIXI.TextStyleAlign, string>;
 }
 
 
