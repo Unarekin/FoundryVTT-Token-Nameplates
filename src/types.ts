@@ -51,6 +51,7 @@ export interface SerializedNameplate {
   alpha: number;
   display: NameplateDisplay;
   autoAnchor: boolean;
+  fontDispositionColor: boolean;
   anchor: {
     x: number;
     y: number;
