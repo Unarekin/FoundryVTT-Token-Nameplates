@@ -29,8 +29,11 @@ export const DefaultNameplate: SerializedNameplate = {
   position: "bottom",
   display: "default",
   value: "",
-
+  autoAnchor: true,
+  anchor: { x: 0.5, y: 0 },
   padding: { x: 0, y: 0 },
+  align: "center",
+  fontDispositionColor: false,
   angle: 0,
   alpha: 1,
   // style: CONFIG.canvasTextStyle as unknown as Record<string, unknown>

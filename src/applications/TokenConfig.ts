@@ -1,5 +1,5 @@
 import { getInterpolationData, interpolate, confirm, serializeStyle, getDefaultNameplate, getDefaultSettings, downloadJSON, uploadJSON } from "functions";
-import { DeepPartial, NameplateConfiguration } from "../types";
+import { DeepPartial, NameplateConfiguration, NameplatePosition, SerializedNameplate } from "../types";
 import { generateFontSelectOptions } from "./functions";
 import { LocalizedError } from "../errors";
 import { NameplateConfigApplication } from "./NameplateConfig";
@@ -326,6 +326,14 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       )
     }
 
+    private nameplatesByPosition(position: NameplatePosition): SerializedNameplate[] {
+      return (this.#flags?.nameplates ?? []).filter(plate => plate.position === position).map(nameplate => ({
+        ...nameplate,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
+      }));
+    }
+
     async _prepareContext(options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       const context = await super._prepareContext(options);
 
@@ -343,16 +351,20 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (context as any).nameplates = {
         enabled: this.#flags?.enabled ?? true,
-        upperNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "top").map(nameplate => ({
-          ...nameplate,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-          actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
-        })),
-        lowerNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "bottom").map(nameplate => ({
-          ...nameplate,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-          actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
-        })),
+        // upperNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "top").map(nameplate => ({
+        //   ...nameplate,
+        //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        //   actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
+        // })),
+        // lowerNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "bottom").map(nameplate => ({
+        //   ...nameplate,
+        //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        //   actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
+        // })),
+        upperNameplates: this.nameplatesByPosition("top"),
+        lowerNameplates: this.nameplatesByPosition("bottom"),
+        rightNameplates: this.nameplatesByPosition("right"),
+        leftNameplates: this.nameplatesByPosition("left"),
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         idPrefix: (this as any).token instanceof foundry.canvas.placeables.Token ? (this as any).token.uuid.replaceAll(".", "-") : `prototype-${(this as any).actor.uuid.replaceAll(".", "-")}`,
         // idPrefix: (this as any).token.uuid.replaceAll(".", "-"),
@@ -371,7 +383,8 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
   foundry.utils.mergeObject(parts, {
     nameplates: {
-      template: `modules/${__MODULE_ID__}/templates/TokenConfig.hbs`
+      template: `modules/${__MODULE_ID__}/templates/TokenConfig.hbs`,
+      templates: [`modules/${__MODULE_ID__}/templates/NameplateList.hbs`]
     },
     footer
   });

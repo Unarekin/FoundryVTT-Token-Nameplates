@@ -10,6 +10,7 @@ export interface NameplateConfigContext extends foundry.applications.api.Applica
   fontSelect: Record<string, string>;
   positionSelect: Record<NameplatePosition, string>;
   displaySelect: Record<NameplateDisplay, string>;
+  alignSelect: Record<PIXI.TextStyleAlign, string>;
 }
 
 
@@ -29,6 +30,8 @@ export interface ActorTypeSelectionConfiguration extends foundry.applications.ap
 export interface GlobalNameplateConfig extends NameplateConfiguration {
   upperNameplates: SerializedNameplate[];
   lowerNameplates: SerializedNameplate[];
+  rightNameplates: SerializedNameplate[];
+  leftNameplates: SerializedNameplate[];
 }
 
 export interface GlobalConfigContext extends foundry.applications.api.ApplicationV2.RenderContext {

@@ -46,6 +46,12 @@
   </div>
 
   <div class="form-group">
+    <label for="{{idPrefix}}-fontDispositionColor">{{localize "NAMEPLATES.CONFIG.FONT.DISPOSITIONCOLOR.LABEL"}}</label>
+    <input type="checkbox" id="{{idPrefix}}-fontDispositionColor" name="fontDispositionColor" {{checked nameplate.fontDispositionColor}}>
+    <p class="hint">{{localize "NAMEPLATES.CONFIG.FONT.DISPOSITIONCOLOR.HINT"}}</p>
+  </div>
+
+  <div class="form-group">
     <label for="{{idPrefix}}-dropShadow">{{localize
         "NAMEPLATES.CONFIG.FONT.DROPSHADOW.LABEL"
       }}</label>

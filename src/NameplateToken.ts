@@ -1,4 +1,4 @@
-import { DeepPartial, NameplateConfiguration, NameplateDisplay } from "types";
+import { DeepPartial, NameplateConfiguration, NameplateDisplay, NameplatePosition } from "types";
 import { Nameplate } from "./Nameplate";
 import { DefaultSettings } from "settings";
 import { getNameplateSettings, serializeStyle } from "functions";
@@ -21,11 +21,18 @@ export class NameplateToken {
 
   private bottomContainer = new PIXI.Container();
   private topContainer = new PIXI.Container();
+  private rightContainer = new PIXI.Container();
+  private leftContainer = new PIXI.Container();
 
   public readonly nameplates: Nameplate[] = [];
 
-  public get bottomNameplates() { return this.nameplates.filter(nameplate => nameplate.position === "bottom"); }
-  public get topNameplates() { return this.nameplates.filter(nameplate => nameplate.position === "top"); }
+  private nameplatesByPosition(position: NameplatePosition): Nameplate[] { return this.nameplates.filter(nameplate => nameplate.position === position); }
+
+  public get bottomNameplates() { return this.nameplatesByPosition("bottom"); }
+  public get topNameplates() { return this.nameplatesByPosition("top"); }
+  public get rightNameplates() { return this.nameplatesByPosition("right"); }
+  public get leftNameplates() { return this.nameplatesByPosition("left"); }
+
   public get destroyed() { return this.#destroyed; }
 
   public get enabled() { return this.#enabled; }
@@ -69,6 +76,10 @@ export class NameplateToken {
 
     const bottom = this.bottomNameplates.sort((a, b) => a.sort - b.sort);
     let y = this.token.object.nameplate?.y ?? 0;
+
+
+    const plateWidth = width * 2.5;
+
     for (const plate of bottom) {
       if (this.shouldDisplay(plate)) {
         plate.object.visible = true;
@@ -76,8 +87,28 @@ export class NameplateToken {
         plate.style.wordWrapWidth = width * 2.5;
         plate.style.wordWrap = true;
         plate.y = y + plate.padding.y;
-        plate.x = ((width - plate.width) / 2) + plate.padding.x;
-        y += plate.height + 2 + plate.padding.x;
+        if (plate.autoAnchor) plate.anchor.y = 0;
+        //plate.x = ((width - plate.width) / 2) + plate.padding.x;
+        switch (plate.align) {
+          case "left":
+          case "justify":
+            if (plate.autoAnchor)
+              plate.anchor.x = 0;
+
+            plate.x = (width / 2) - (plateWidth / 2);
+            break;
+          case "right":
+            if (plate.autoAnchor)
+              plate.anchor.x = 1;
+            plate.x = (width / 2) + (plateWidth / 2);
+            break;
+          default:
+            if (plate.autoAnchor)
+              plate.anchor.x = 0.5;
+            plate.x = width / 2;
+        }
+        plate.x += plate.padding.x;
+        y += plate.height + 2 + plate.padding.y;
       } else {
         plate.object.visible = false;
       }
@@ -95,7 +126,96 @@ export class NameplateToken {
         plate.style.wordWrapWidth = width * 2.5;
         plate.style.wordWrap = true;
         plate.y = y;
-        plate.x = ((width - plate.width) / 2) + plate.padding.x;
+
+        switch (plate.align) {
+          case "left":
+          case "justify":
+            if (plate.autoAnchor)
+              plate.anchor.x = 0;
+
+            plate.x = (width / 2) - (plateWidth / 2);
+            break;
+          case "right":
+            if (plate.autoAnchor)
+              plate.anchor.x = 1;
+            plate.x = (width / 2) + (plateWidth / 2);
+            break;
+          default:
+            if (plate.autoAnchor)
+              plate.anchor.x = 0.5;
+            plate.x = width / 2;
+        }
+
+        plate.y = y + plate.padding.y;
+        y += plate.height + 2 + plate.padding.y;
+      } else {
+        plate.object.visible = false;
+      }
+    }
+
+    const right = this.rightNameplates.sort((a, b) => a.sort - b.sort);
+    y = 0;
+    for (const plate of right) {
+      if (this.shouldDisplay(plate)) {
+        plate.object.visible = true;
+        plate.refreshText();
+        plate.style.wordWrapWidth = width * 2.5;
+        plate.style.wordWrap = true;
+
+        if (plate.autoAnchor) plate.anchor.y = 0;
+        plate.y = y + plate.padding.y;
+
+        switch (plate.align) {
+          case "left":
+          case "justify":
+            if (plate.autoAnchor) plate.anchor.x = 0;
+            plate.x = width + 2;
+            break;
+          case "right":
+            if (plate.autoAnchor) plate.anchor.x = 1;
+            plate.x = width + 2 + (width * 2.5);
+            break;
+          default:
+            if (plate.autoAnchor) plate.anchor.x = 0.5;
+            plate.x = width + 2 + ((width * 2.5) / 2);
+            break;
+        }
+        plate.x += plate.padding.x;
+        y += plate.height + 2 + plate.padding.y;
+      } else {
+        plate.object.visible = false;
+      }
+    }
+
+    const left = this.leftNameplates.sort((a, b) => a.sort - b.sort);
+    y = 0;
+    for (const plate of left) {
+      if (this.shouldDisplay(plate)) {
+        plate.object.visible = true;
+        plate.refreshText();
+        plate.style.wordWrapWidth = width * 2.5;
+        plate.style.wordWrap = true;
+
+        if (plate.autoAnchor) plate.anchor.y = 0;
+        plate.y = y + plate.padding.y;
+        switch (plate.align) {
+          case "left":
+            if (plate.autoAnchor) plate.anchor.x = 0;
+            plate.x = -(width * 2.5) - 2;
+            break;
+          case "right":
+          case "justify":
+            if (plate.autoAnchor) plate.anchor.x = 1;
+            plate.x = -2;
+            break;
+          default:
+            if (plate.autoAnchor) plate.anchor.x = 0.5;
+            plate.x = ((- (width * 2.5)) + plate.width / 2);
+            break;
+        }
+
+        plate.x += plate.padding.x;
+        y += plate.height + 2 + plate.padding.y;
       } else {
         plate.object.visible = false;
       }
@@ -132,6 +252,8 @@ export class NameplateToken {
 
     if (this.topNameplates.length) this.topContainer.addChild(...this.topNameplates.map(plate => plate.object));
     if (this.bottomNameplates.length) this.bottomContainer.addChild(...this.bottomNameplates.map(plate => plate.object));
+    if (this.rightNameplates.length) this.rightContainer.addChild(...this.rightNameplates.map(plate => plate.object));
+    if (this.leftNameplates.length) this.leftContainer.addChild(...this.leftNameplates.map(plate => plate.object));
 
     // Ensure properly positioned/sized
     this.refreshNameplates();
@@ -195,10 +317,14 @@ export class NameplateToken {
 
     this.topContainer.name = "Top Nameplates";
     this.bottomContainer.name = "Bottom Nameplates";
+    this.rightContainer.name = "Right Nameplates";
+    this.leftContainer.name = "Left Nameplates";
 
     if (this.token?.object) {
       this.token.object.addChild(this.topContainer);
       this.token.object.addChild(this.bottomContainer);
+      this.token.object.addChild(this.rightContainer);
+      this.token.object.addChild(this.leftContainer);
 
       if (this.token.object.nameplate) this.token.object.nameplate.renderable = false;
       if (this.token.object.tooltip) this.token.object.tooltip.renderable = false;

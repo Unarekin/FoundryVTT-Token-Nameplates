@@ -12,6 +12,14 @@ export class Nameplate {
 
   #text = "";
 
+  #autoAnchor = true;
+  public get autoAnchor() { return this.#autoAnchor; }
+  public set autoAnchor(val) { this.#autoAnchor = val; }
+
+  #fontDispositionColor = false;
+  public get fontDispositionColor() { return this.#fontDispositionColor; }
+  public set fontDispositionColor(val) { this.#fontDispositionColor = val; }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   public readonly glow = new (PIXI.filters as any).GlowFilter() as PIXI.Filter;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -53,6 +61,15 @@ export class Nameplate {
     if (config.style) this.style = config.style;
     this.display = config.display ?? "default";
 
+    this.anchor.x = config.anchor?.x ?? 0.5;
+    this.anchor.y = config.anchor?.y ?? 0.5;
+    this.autoAnchor = config.autoAnchor ? true : false;
+
+    this.fontDispositionColor = config.fontDispositionColor ? true : false;
+    if (this.fontDispositionColor) this.style.fill = this.getDispositionColor();
+
+    this.align = config.align ?? "center";
+
     if (config.effects) {
       const { glow, outline } = config.effects;
       if (glow) {
@@ -67,9 +84,13 @@ export class Nameplate {
         if (glow.useDispositionColor) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.glow as any).color = this.getDispositionColor();
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.glow as any).useDispositionColor = true
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.glow as any).color = typeof glow.color === "string" ? glow.color : "FFFFFF";
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.glow as any).useDispositionColor = false;
         }
 
       }
@@ -84,9 +105,13 @@ export class Nameplate {
         if (outline.useDispositionColor) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.outline as any).color = this.getDispositionColor();
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.outline as any).useDispositionColor = true;
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.outline as any).color = typeof outline.color === "string" ? outline.color : "FFFFFF";
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (this.outline as any).useDispositionColor = false;
         }
       }
     }
@@ -111,6 +136,13 @@ export class Nameplate {
       angle: this.angle,
       alpha: this.alpha,
       display: this.display,
+      autoAnchor: this.autoAnchor,
+      fontDispositionColor: this.fontDispositionColor,
+      align: this.align,
+      anchor: {
+        x: this.anchor.x,
+        y: this.anchor.y
+      },
       padding: {
         x: this.padding.x,
         y: this.padding.y
@@ -125,7 +157,9 @@ export class Nameplate {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           outerStrength: (this.glow as any).outerStrength as number,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          alpha: (this.glow as any).alpha as number
+          alpha: (this.glow as any).alpha as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          useDispositionColor: (this.glow as any)?.useDispositionColor as boolean ?? false
         },
         outline: {
           enabled: this.outline.enabled,
@@ -134,7 +168,9 @@ export class Nameplate {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           alpha: (this.outline as any).alpha as number,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          thickness: (this.outline as any).thickness as number
+          thickness: (this.outline as any).thickness as number,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          useDispositionColor: (this.outline as any)?.useDispositionColor as boolean ?? false
         }
       },
       style: this.serializeStyle(),

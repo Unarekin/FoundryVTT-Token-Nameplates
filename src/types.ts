@@ -24,7 +24,7 @@ export type DeepPartial<T> = T extends unknown
 export type AnyArray = readonly unknown[];
 export type AnyFunction = (arg0: never, ...args: never[]) => unknown;
 
-export const NameplatePositions = ["top", "bottom"] as const;
+export const NameplatePositions = ["top", "bottom", "right", "left"] as const;
 export type NameplatePosition = typeof NameplatePositions[number];
 
 export interface TokenNameplates {
@@ -47,8 +47,15 @@ export interface SerializedNameplate {
   value: string;
   padding: { x: number; y: number };
   angle: number;
+  align: PIXI.TextStyleAlign;
   alpha: number;
   display: NameplateDisplay;
+  autoAnchor: boolean;
+  fontDispositionColor: boolean;
+  anchor: {
+    x: number;
+    y: number;
+  }
   effects: {
     glow?: NameplateGlowEffect;
     outline?: NameplateOutlineEffect;
