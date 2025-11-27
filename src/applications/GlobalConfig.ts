@@ -9,7 +9,9 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
   #config: GlobalNameplateConfig = {
     ...getDefaultSettings(),
     upperNameplates: [],
-    lowerNameplates: []
+    lowerNameplates: [],
+    rightNameplates: [],
+    leftNameplates: []
   }
 
   public static DEFAULT_OPTIONS: DeepPartial<foundry.applications.api.ApplicationV2.Configuration> = {
@@ -50,7 +52,8 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
 
   public static PARTS: Record<string, foundry.applications.api.HandlebarsApplicationMixin.HandlebarsTemplatePart> = {
     config: {
-      template: `modules/${__MODULE_ID__}/templates/TokenConfig.hbs`
+      template: `modules/${__MODULE_ID__}/templates/TokenConfig.hbs`,
+      templates: [`modules/${__MODULE_ID__}/templates/NameplateList.hbs`]
     },
     footer: {
       template: `templates/generic/form-footer.hbs`
