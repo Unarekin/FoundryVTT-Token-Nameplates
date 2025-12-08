@@ -337,6 +337,8 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
     async _prepareContext(options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       const context = await super._prepareContext(options);
 
+
+
       if (options.force || options.isFirstRender || !this.#flags) {
         const defaultSettings = getDefaultSettings();
         this.#flags = foundry.utils.mergeObject(
@@ -390,7 +392,7 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
   });
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  foundry.utils.mergeObject((Base as any).PARTS ?? {}, parts);
+  foundry.utils.mergeObject((TokenConfiguration as any).PARTS ?? {}, parts);
 
   TokenConfiguration.TABS.sheet.tabs.push({
     id: "nameplates",
@@ -398,5 +400,17 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
     cssClass: ""
   });
 
+  ((canvas?.scene?.tokens.contents ?? [])).forEach(token => {
+    if (token.sheet && !(token.sheet instanceof TokenConfiguration)) {
+
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        token._sheet = new TokenConfiguration(token.sheet.options);
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+
+  });
   return TokenConfiguration;
 }

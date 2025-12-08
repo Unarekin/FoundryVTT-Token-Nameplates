@@ -75,35 +75,36 @@ export class NameplateToken {
     const { width } = this.token.object.bounds;
 
     const bottom = this.bottomNameplates.sort((a, b) => a.sort - b.sort);
-    let y = this.token.object.nameplate?.y ?? 0;
+    let y = (this.token.object.nameplate?.y ?? 0);
 
 
     const plateWidth = width * 2.5;
 
     for (const plate of bottom) {
       if (this.shouldDisplay(plate)) {
+        const autoAnchor = plate.autoAnchor ?? true;
         plate.object.visible = true;
         plate.refreshText();
         plate.style.wordWrapWidth = width * 2.5;
         plate.style.wordWrap = true;
         plate.y = y + plate.padding.y;
-        if (plate.autoAnchor) plate.anchor.y = 0;
+        if (autoAnchor) plate.anchor.y = 0;
         //plate.x = ((width - plate.width) / 2) + plate.padding.x;
         switch (plate.align) {
           case "left":
           case "justify":
-            if (plate.autoAnchor)
+            if (autoAnchor)
               plate.anchor.x = 0;
 
             plate.x = (width / 2) - (plateWidth / 2);
             break;
           case "right":
-            if (plate.autoAnchor)
+            if (autoAnchor)
               plate.anchor.x = 1;
             plate.x = (width / 2) + (plateWidth / 2);
             break;
           default:
-            if (plate.autoAnchor)
+            if (autoAnchor)
               plate.anchor.x = 0.5;
             plate.x = width / 2;
         }
@@ -118,6 +119,7 @@ export class NameplateToken {
     const top = this.topNameplates.sort((a, b) => a.sort - b.sort);
     y = (this.token.object.tooltip?.y ?? 0);
     for (const plate of top) {
+      const autoAnchor = plate.autoAnchor ?? true;
       // if (this.token.object.tooltip?.visible && !(plate.text === "{tooltip}" && this.token.object.tooltip?.text === "")) {
       if (this.shouldDisplay(plate)) {
         plate.object.visible = true;
@@ -130,18 +132,18 @@ export class NameplateToken {
         switch (plate.align) {
           case "left":
           case "justify":
-            if (plate.autoAnchor)
+            if (autoAnchor)
               plate.anchor.x = 0;
 
             plate.x = (width / 2) - (plateWidth / 2);
             break;
           case "right":
-            if (plate.autoAnchor)
+            if (autoAnchor)
               plate.anchor.x = 1;
             plate.x = (width / 2) + (plateWidth / 2);
             break;
           default:
-            if (plate.autoAnchor)
+            if (autoAnchor)
               plate.anchor.x = 0.5;
             plate.x = width / 2;
         }
@@ -157,26 +159,27 @@ export class NameplateToken {
     y = 0;
     for (const plate of right) {
       if (this.shouldDisplay(plate)) {
+        const autoAnchor = plate.autoAnchor ?? true;
         plate.object.visible = true;
         plate.refreshText();
         plate.style.wordWrapWidth = width * 2.5;
         plate.style.wordWrap = true;
 
-        if (plate.autoAnchor) plate.anchor.y = 0;
+        if (autoAnchor) plate.anchor.y = 0;
         plate.y = y + plate.padding.y;
 
         switch (plate.align) {
           case "left":
           case "justify":
-            if (plate.autoAnchor) plate.anchor.x = 0;
+            if (autoAnchor) plate.anchor.x = 0;
             plate.x = width + 2;
             break;
           case "right":
-            if (plate.autoAnchor) plate.anchor.x = 1;
+            if (autoAnchor) plate.anchor.x = 1;
             plate.x = width + 2 + (width * 2.5);
             break;
           default:
-            if (plate.autoAnchor) plate.anchor.x = 0.5;
+            if (autoAnchor) plate.anchor.x = 0.5;
             plate.x = width + 2 + ((width * 2.5) / 2);
             break;
         }
@@ -191,25 +194,26 @@ export class NameplateToken {
     y = 0;
     for (const plate of left) {
       if (this.shouldDisplay(plate)) {
+        const autoAnchor = plate.autoAnchor ?? true;
         plate.object.visible = true;
         plate.refreshText();
         plate.style.wordWrapWidth = width * 2.5;
         plate.style.wordWrap = true;
 
-        if (plate.autoAnchor) plate.anchor.y = 0;
+        if (autoAnchor) plate.anchor.y = 0;
         plate.y = y + plate.padding.y;
         switch (plate.align) {
           case "left":
-            if (plate.autoAnchor) plate.anchor.x = 0;
+            if (autoAnchor) plate.anchor.x = 0;
             plate.x = -(width * 2.5) - 2;
             break;
           case "right":
           case "justify":
-            if (plate.autoAnchor) plate.anchor.x = 1;
+            if (autoAnchor) plate.anchor.x = 1;
             plate.x = -2;
             break;
           default:
-            if (plate.autoAnchor) plate.anchor.x = 0.5;
+            if (autoAnchor) plate.anchor.x = 0.5;
             plate.x = ((- (width * 2.5)) + plate.width / 2);
             break;
         }
