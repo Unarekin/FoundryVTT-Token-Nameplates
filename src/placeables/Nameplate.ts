@@ -31,15 +31,28 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
     }
   }
 
-  protected getDispositionColor(): PIXI.ColorSource { return "#FFFFFF"; }
+  protected getDispositionColor(token: TokenDocument): PIXI.Color {
+    if (!token) return new PIXI.Color("white");
+
+    const disposition = Object.entries(CONST.TOKEN_DISPOSITIONS).find(([, val]) => val === token.disposition)?.[0] ?? CONST.TOKEN_DISPOSITIONS.NEUTRAL;
+    console.log("Disposition:", token.disposition, disposition)
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const color = (CONFIG.Canvas.dispositionColors as any)[disposition as any] as PIXI.ColorSource;
+    try {
+      const actualColor = new PIXI.Color(color);
+      if (actualColor instanceof PIXI.Color)
+        return actualColor
+    } catch { /* Empty */ }
+    return new PIXI.Color("white");
+  }
 
   public refreshText(data: Record<string, unknown>) {
     this.text = interpolate(this.encodedText, data);
   }
 
-  public static deserialize(placeable: foundry.canvas.placeables.PlaceableObject, config: SerializedNameplate): Nameplate { return new Nameplate(placeable, config); }
 
-  public deserialize(config: SerializedNameplate): Nameplate {
+  public deserialize(config: SerializedNameplate, placeable: foundry.abstract.Document.Any): Nameplate {
 
     this.#id = config.id;
     this.encodedText = config.value;
@@ -65,7 +78,11 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
 
     this.style.align = config.align ?? "center";
 
-    console.log("Deserializing effects:", config.effects);
+    if (config.fontDispositionColor && placeable instanceof TokenDocument) {
+      this.style.fill = this.getDispositionColor(placeable).toHex();
+    }
+
+
     if (config.effects) {
       const { glow, outline } = config.effects;
       if (glow) {
@@ -79,9 +96,9 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         (this.glow as any).useDispositionColor = Boolean(glow.useDispositionColor);
-        if (glow.useDispositionColor) {
+        if (glow.useDispositionColor && placeable instanceof TokenDocument) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (this.glow as any).color = this.getDispositionColor();
+          (this.glow as any).color = this.getDispositionColor(placeable);
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.glow as any).color = typeof glow.color === "string" ? glow.color : "#FFFFFF";
@@ -99,9 +116,9 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         (this.outline as any).useDispositionColor = outline.useDispositionColor;
-        if (outline.useDispositionColor) {
+        if (outline.useDispositionColor && placeable instanceof TokenDocument) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (this.outline as any).color = this.getDispositionColor();
+          (this.outline as any).color = this.getDispositionColor(placeable);
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           (this.outline as any).color = typeof outline.color === "string" ? outline.color : "#FFFFFF";
@@ -125,7 +142,7 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
       this.object = placeable;
       this.filters = [this.glow, this.outline];
       this.glow.enabled = this.outline.enabled = false;
-      this.deserialize(config);
+      this.deserialize(config, placeable.document);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       super(...args);
