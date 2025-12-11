@@ -1,5 +1,5 @@
 import { ActorTypeSelectionApplication } from "applications"
-import { NameplateConfiguration, SerializedNameplate } from "types"
+import { NameplateConfiguration, NameplateDisplay, SerializedNameplate } from "types"
 
 declare global {
   interface SettingsConfig {
@@ -13,6 +13,15 @@ declare global {
       [__MODULE_ID__]: NameplateConfiguration
     }
   }
+}
+
+export const TokenDisplayHash: Record<number, NameplateDisplay> = {
+  50: "always",
+  10: "control",
+  30: "hover",
+  0: "none",
+  40: "owner",
+  20: "ownerHover"
 }
 
 export const DefaultSettings: NameplateConfiguration = {
@@ -75,6 +84,6 @@ Hooks.once("ready", () => {
     requiresReload: false,
     type: Object,
     default: {},
-    onChange() { TokenNameplates.tokens.forEach(token => token.actorUpdated({})); }
+    onChange() { game?.TokenNameplates?.refreshAllTokens(); }
   })
 })

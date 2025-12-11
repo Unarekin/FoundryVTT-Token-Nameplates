@@ -1,4 +1,3 @@
-import { NameplateToken } from "NameplateToken";
 
 type Version = "1.1.0";
 
@@ -28,8 +27,9 @@ export const NameplatePositions = ["top", "bottom", "right", "left"] as const;
 export type NameplatePosition = typeof NameplatePositions[number];
 
 export interface TokenNameplates {
-  // tokens: WeakMap<foundry.canvas.placeables.Token, NameplateToken>;
-  tokens: NameplateToken[];
+  refreshAllTokens: () => void;
+  refreshTokensWithPrototype: (token: foundry.data.PrototypeToken) => void;
+  classes: Record<string, any>;
 }
 
 type PropsCoercedToPOrNeverOnO<O, P> = { [k in keyof O]: O[k] extends P ? k : never }[keyof O];
@@ -37,6 +37,12 @@ export type PropsOfType<P, O> = Record<PropsCoercedToPOrNeverOnO<P, O>, O>;
 
 export const NameplateDisplayOptions = ["default", "none", "control", "ownerHover", "hover", "owner", "always"] as const;
 export type NameplateDisplay = typeof NameplateDisplayOptions[number];
+
+
+export interface NameplatePlaceable {
+  refreshNameplates: (force?: boolean) => void;
+  getInterpolationData: () => Record<string, unknown>;
+}
 
 export interface SerializedNameplate {
   id: string;

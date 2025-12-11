@@ -1,5 +1,5 @@
 import { DefaultNameplate } from "settings";
-import { NameplateConfiguration, SerializedNameplate } from "types";
+import { DeepPartial, NameplateConfiguration, SerializedNameplate } from "types";
 
 /** Strips HTML from a given string */
 export function stripHTML(val: string): string {
@@ -39,23 +39,6 @@ export function getKeys(actorType: string): string[] {
   keys.push("tooltip", "flags");
   return keys.filter((key, i, arr) => arr.indexOf(key) === i);
 }
-
-export function getInterpolationData(doc: TokenDocument): Record<string, unknown> {
-
-  const data = foundry.utils.flattenObject({
-    ...doc.toObject(),
-    tooltip: (doc.object?.tooltip?.text ?? ""),
-    flags: foundry.utils.mergeObject({
-      ...(doc.actor?.flags ?? {}),
-      ...(doc.flags ?? {})
-    }),
-    system: foundry.utils.flattenObject(doc.actor?.system ?? {})
-    // ...(doc.actor?.toObject() ?? {})
-  }) as Record<string, unknown>;
-
-  return data;
-}
-
 
 export async function confirm(title: string, content: string): Promise<boolean> {
   return foundry.applications.api.DialogV2.confirm({
@@ -105,23 +88,14 @@ export function getDefaultSettings(): NameplateConfiguration {
   }
 }
 
-export function getNameplateSettings(actor?: Actor): NameplateConfiguration
-export function getNameplateSettings(token?: Token): NameplateConfiguration
-export function getNameplateSettings(token?: TokenDocument): NameplateConfiguration
-export function getNameplateSettings(obj?: unknown): NameplateConfiguration {
-  const actor: Actor | undefined = (obj instanceof Actor ? obj : obj instanceof foundry.canvas.placeables.Token ? obj.actor : obj instanceof TokenDocument ? obj.actor : undefined) ?? undefined;
+
+export function getNameplateSettings(obj?: foundry.abstract.Document.Any): NameplateConfiguration {
 
   const baseSettings = getDefaultSettings();
-
-  if (actor?.flags[__MODULE_ID__]?.enabled) {
-    foundry.utils.mergeObject(baseSettings, actor.flags[__MODULE_ID__]);
-  } else {
-    const globalConfig = (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) as Record<string, NameplateConfiguration>;
-    if (actor && globalConfig[actor.type]?.enabled) {
-      foundry.utils.mergeObject(baseSettings, globalConfig[actor.type])
-    } else if (globalConfig?.global?.enabled) {
-      foundry.utils.mergeObject(baseSettings, globalConfig.global);
-    }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  if (((obj?.flags as any)[__MODULE_ID__] as DeepPartial<NameplateConfiguration> | undefined)?.enabled) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    foundry.utils.mergeObject(baseSettings, ((obj?.flags as any)[__MODULE_ID__] as DeepPartial<NameplateConfiguration> | undefined) ?? {});
   }
 
   return baseSettings;
@@ -176,8 +150,23 @@ export function getAutocompleteValue(text: string): string {
   return split[split.length - 1];
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getAutocompleteSuggestions(token: TokenDocument | Actor, text: string): string[] {
-  return Object.keys(getInterpolationData(token))
-    .filter(key => key.startsWith(text));
+  return [];
+  // return Object.keys(getInterpolationData(token))
+  //   .filter(key => key.startsWith(text));
 }
 
+export function getPrototypeTokenInterpolationData(token: foundry.data.PrototypeToken): Record<string, unknown> {
+  const data = {};
+
+  foundry.utils.mergeObject(data, token.toObject())
+  if (token.actor) {
+    foundry.utils.mergeObject(data, {
+      actor: token.actor.toObject(),
+      system: foundry.utils.flattenObject(token.actor.system)
+    });
+  }
+
+  return data;
+}

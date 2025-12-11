@@ -12,5 +12,7 @@ declare global {
   declare module '*.scss';
   declare const libWrapper: any;
 
-  declare var TokenNameplates: TokenNameplates;
+  interface Game {
+    TokenNameplates: TokenNameplates;
+  }
 }
