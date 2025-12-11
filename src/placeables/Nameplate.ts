@@ -65,6 +65,7 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
 
     this.style.align = config.align ?? "center";
 
+    console.log("Deserializing effects:", config.effects);
     if (config.effects) {
       const { glow, outline } = config.effects;
       if (glow) {
@@ -122,14 +123,16 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
       const config = args[0] as SerializedNameplate;
       super(config.value, config.style, args[1] as PIXI.ICanvas | undefined);
       this.object = placeable;
+      this.filters = [this.glow, this.outline];
+      this.glow.enabled = this.outline.enabled = false;
       this.deserialize(config);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       super(...args);
       this.object = placeable;
+      this.filters = [this.glow, this.outline];
+      this.glow.enabled = this.outline.enabled = false;
     }
 
-    this.filters = [this.glow, this.outline];
-    this.glow.enabled = this.outline.enabled = false;
   }
 }
