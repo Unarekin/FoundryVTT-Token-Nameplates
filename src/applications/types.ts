@@ -32,6 +32,7 @@ export interface GlobalNameplateConfig extends NameplateConfiguration {
   lowerNameplates: SerializedNameplate[];
   rightNameplates: SerializedNameplate[];
   leftNameplates: SerializedNameplate[];
+  showTokenOverrides: boolean;
 }
 
 export interface GlobalConfigContext extends foundry.applications.api.ApplicationV2.RenderContext {

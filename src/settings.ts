@@ -28,6 +28,7 @@ export const DefaultSettings: NameplateConfiguration = {
   enabled: true,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   version: __MODULE_VERSION__ as any,
+  useTokenOverride: false,
   nameplates: []
 }
 

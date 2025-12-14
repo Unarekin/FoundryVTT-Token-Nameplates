@@ -90,5 +90,6 @@ export interface NameplateOutlineEffect extends NameplateEffect {
 export interface NameplateConfiguration {
   enabled: boolean;
   version: Version;
+  useTokenOverride: boolean;
   nameplates: SerializedNameplate[];
 }

@@ -4,7 +4,12 @@ import { NameplatePlaceableMixin } from "./NameplatePlaceable"
 export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.Token>(base: t) {
   return class NameplateToken extends NameplatePlaceableMixin<t>(base) {
 
-    protected getFlagDocument(): TokenDocument | Actor { return this.document.actor ?? this.document; }
+    protected getFlagDocument(): TokenDocument | Actor {
+      if (this.document.getFlag(__MODULE_ID__, "useTokenOverride"))
+        return this.document;
+
+      return this.document.actor ?? this.document;
+    }
 
     public get isOwner() { return super.isOwner; }
     public get hover() { return super.hover; }
