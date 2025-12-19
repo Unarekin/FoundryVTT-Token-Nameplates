@@ -1,4 +1,4 @@
-import { NameplateConfiguration } from "types";
+import { IsometricFlags, NameplateConfiguration } from "types";
 import { Nameplate } from "./Nameplate";
 import { getNameplateSettings } from "functions";
 
@@ -73,13 +73,46 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       }
     }
 
+    protected get shouldInvertIsometry() {
+      if (!game.modules?.get("isometric-perspective")?.active) return false;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (!(game.settings?.settings as any).get(`${__MODULE_ID__}.invertIsometryTransform`)) return false;
+      if (!game.settings?.get(__MODULE_ID__, "invertIsometryTransform")) return false;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (!(this.scene.flags as any)["isometric-perspective"]?.isometricEnabled) return false;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (((this.document as any).flags["isometric-perspective"] as IsometricFlags).isoTokenDisabled) return false;
+      if (!game.settings?.get("isometric-perspective", "worldIsometricFlag")) return false;
+
+      return true;
+      // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      // return !!((game.settings?.settings as any).get(`${__MODULE_ID__}.invertIsometryTransform`) && game.settings?.get(__MODULE_ID__, "invertIsometryTransform") && (this.scene.flags as any)["isometric-perspective"]?.isometricEnabled && !((this.document as any).flags["isometric-perspective"] as IsometricFlags).isoTokenDisabled);
+    }
+
     protected positionNameplates(list: Nameplate[], up = false, initialY = 0) {
       const { width } = this.bounds;
       const sorted = list.toSorted((a, b) => a.sort - b.sort);
 
       let y = initialY;
+      let xAdjust = 0;
+
+
+      if (this.shouldInvertIsometry && (this.document instanceof TokenDocument || this.document instanceof TileDocument)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const isoFlags = (this.document.flags as any)["isometric-perspective"] as IsometricFlags;
+        if (isoFlags?.offsetX) y -= isoFlags.offsetX;
+        if (isoFlags?.offsetY) xAdjust -= isoFlags.offsetY;
+        xAdjust -= this.document.width * this.scene.dimensions.size / 4;
+        if (up)
+          y -= this.document.height * this.scene.dimensions.size;
+      }
+
+
       for (const plate of sorted) {
         if (this.shouldDisplay(plate)) {
+
+
+
           plate.visible = true;
           if (up)
             y -= (plate.height) + this.padding;
@@ -96,15 +129,15 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
             case "left":
             case "justify":
               if (plate.autoAnchor) plate.anchor.x = 0;
-              plate.x = (width / 2) - (plate.style.wordWrapWidth / 2);
+              plate.x = ((width / 2) - (plate.style.wordWrapWidth / 2)) - xAdjust;
               break;
             case "right":
               if (plate.autoAnchor) plate.anchor.x = 1;
-              plate.x = (width / 2) + (plate.style.wordWrapWidth / 2);
+              plate.x = ((width / 2) + (plate.style.wordWrapWidth / 2)) - xAdjust;
               break;
             default:
               if (plate.autoAnchor) plate.anchor.x = 0.5;
-              plate.x = width / 2;
+              plate.x = (width / 2) - xAdjust
           }
 
         } else {
@@ -113,11 +146,61 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       }
     }
 
-    protected positionTopNameplates() { this.positionNameplates(this.topNameplates, true); }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-    protected positionBottomNameplates() { this.positionNameplates(this.bottomNameplates, false, ((this as any).nameplate?.y ?? 0) + this.padding); }
-    protected positionLeftNameplates() { this.positionNameplates(this.leftNameplates); }
-    protected positionRightNameplates() { this.positionNameplates(this.rightNameplates); }
+    protected invertIsometry(displayObject: PIXI.DisplayObject) {
+      displayObject.angle = 45;
+      displayObject.skew.x = displayObject.skew.y = 0;
+    }
+
+    protected positionTopNameplates() {
+      this.positionNameplates(this.topNameplates, true);
+      if (this.shouldInvertIsometry) this.invertIsometry(this.topContainer);
+      else this.topContainer.angle = 0;
+    }
+
+    protected positionBottomNameplates() {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      this.positionNameplates(this.bottomNameplates, false, ((this as any).nameplate?.y ?? 0) + this.padding);
+      if (this.shouldInvertIsometry) this.invertIsometry(this.bottomContainer);
+      else this.bottomContainer.angle = 0;
+    }
+    protected positionLeftNameplates() {
+      this.positionNameplates(this.leftNameplates);
+      if (this.shouldInvertIsometry) {
+        this.invertIsometry(this.leftContainer);
+        this.leftContainer.x = -((this.getPlateWrapWidth() / 2) + (this.padding * 2));
+        this.leftContainer.y = -((this.getPlateWrapWidth() / 2) + (this.padding * 2));
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const isoFlags = (this.document.flags as any)["isometric-perspective"] as IsometricFlags;
+        if (isoFlags) {
+          if (isoFlags?.offsetX) this.leftContainer.y -= isoFlags.offsetX;
+          if (isoFlags?.offsetY) this.leftContainer.x -= isoFlags.offsetY;
+        }
+      } else {
+        this.leftContainer.angle = 0;
+        this.leftContainer.y = 0;
+        this.leftContainer.x = -(((this.document as TokenDocument).width * 2 * this.scene.dimensions.size) + this.padding);
+
+      }
+    }
+    protected positionRightNameplates() {
+      this.positionNameplates(this.rightNameplates);
+      if (this.shouldInvertIsometry) {
+        this.invertIsometry(this.rightContainer);
+        this.rightContainer.x = ((this.getPlateWrapWidth() / 2) + (this.padding * 2));
+        this.rightContainer.y = ((this.getPlateWrapWidth() / 2) + (this.padding * 2));
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const isoFlags = (this.document.flags as any)["isometric-perspective"] as IsometricFlags;
+        if (isoFlags) {
+          if (isoFlags?.offsetX) this.leftContainer.y += isoFlags.offsetX;
+          if (isoFlags?.offsetY) this.leftContainer.x += isoFlags.offsetY;
+        }
+      } else {
+        this.rightContainer.angle = 0;
+        this.rightContainer.y = 0;
+        this.rightContainer.x = (((this.document as TokenDocument).width * 2 * this.scene.dimensions.size) + this.padding);
+      }
+
+    }
 
     protected clearContainer(container: PIXI.Container) {
       const children = container.removeChildren();
@@ -150,8 +233,6 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
 
       const interpolationData = this.getInterpolationData();
       this.nameplates.forEach(plate => { plate.refreshText(interpolationData); });
-
-
     }
 
     protected _refreshPosition() {

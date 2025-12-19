@@ -1,6 +1,10 @@
 {
   "NAMEPLATES": {
     "SETTINGS": {
+      "INVERTISOMETRY": {
+        "LABEL": "Invert Isometry Transform",
+        "HINT": "If enabled, will undo the perspective changes of isometric projection modules for nameplates"
+      },
       "GLOBAL": {
         "LABEL": "Configure",
         "TEXT": "Global Settings",

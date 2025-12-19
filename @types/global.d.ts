@@ -15,4 +15,27 @@ declare global {
   interface Game {
     TokenNameplates: TokenNameplates;
   }
+
+
+
+  interface SettingsConfig {
+    [__MODULE_ID__]: {
+      invertIsometryTransform: boolean;
+      globalConfigurations: Record<string, NameplateConfiguration>
+    } // Placeholder for later
+  }
+
+  interface FlagConfig {
+    Actor: {
+      [__MODULE_ID__]: NameplateConfiguration
+    },
+    TileDocument: {
+      [__MODULE_ID__]: NameplateConfiguration,
+      "isometric-perspective"?: IsometricFlags;
+    },
+    TokenDocument: {
+      [__MODULE_ID__]: NameplateConfiguration,
+      "isometric-perspective"?: IsometricFlags;
+    }
+  }
 }

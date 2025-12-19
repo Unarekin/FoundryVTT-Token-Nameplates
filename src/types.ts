@@ -93,3 +93,12 @@ export interface NameplateConfiguration {
   useTokenOverride: boolean;
   nameplates: SerializedNameplate[];
 }
+
+export interface IsometricFlags {
+  isoAnchorX: number;
+  isoAnchorY: number;
+  offsetX: number;
+  offsetY: number;
+  scale: number;
+  isoTokenDisabled;
+}

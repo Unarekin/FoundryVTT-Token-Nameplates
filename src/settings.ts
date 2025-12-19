@@ -1,20 +1,6 @@
 import { ActorTypeSelectionApplication } from "applications"
 import { NameplateConfiguration, NameplateDisplay, SerializedNameplate } from "types"
 
-declare global {
-  interface SettingsConfig {
-    [__MODULE_ID__]: {
-      globalConfigurations: Record<string, NameplateConfiguration>
-    } // Placeholder for later
-  }
-
-  interface FlagConfig {
-    Actor: {
-      [__MODULE_ID__]: NameplateConfiguration
-    }
-  }
-}
-
 export const TokenDisplayHash: Record<number, NameplateDisplay> = {
   50: "always",
   10: "control",
@@ -76,6 +62,18 @@ Hooks.once("ready", () => {
     type: ActorTypeSelectionApplication,
     restricted: true
   });
+
+  game.settings?.register(__MODULE_ID__, "invertIsometryTransform", {
+    name: "Invert Isometry",
+    label: game.i18n?.localize("NAMEPLATES.SETTINGS.INVERTISOMETRY.LABEL"),
+    hint: game.i18n?.localize("NAMEPLATES.SETTINGS.INVERTISOMETRY.HINT") ?? "",
+    scope: "world",
+    requiresReload: false,
+    type: Boolean,
+    default: false,
+    config: !!game.modules.get("isometric-perspective")?.active,
+    onChange() { game?.TokenNameplates?.refreshAllTokens(); }
+  })
 
   game.settings?.register(__MODULE_ID__, "globalConfigurations", {
     name: "Global Configurations",
