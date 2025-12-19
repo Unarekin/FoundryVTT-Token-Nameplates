@@ -17,17 +17,17 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
 
 
     protected getInterpolationData() {
-      const data: Record<string, unknown> = foundry.utils.flattenObject(this.document.toObject()) as Record<string, unknown>
+      const data: Record<string, unknown> = this.document.toObject() as Record<string, unknown>
       if (this.tooltip?.text) data.tooltip = this.tooltip.text;
 
       if (this.actor) {
         foundry.utils.mergeObject(data, {
           actor: this.actor.toObject(),
-          system: foundry.utils.flattenObject(this.actor.system)
+          system: this.actor.system
         });
       }
 
-      return data;
+      return foundry.utils.flattenObject(data);
     }
 
     protected _refreshNameplate() {
