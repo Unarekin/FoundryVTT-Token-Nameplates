@@ -12,10 +12,17 @@
       {{/if}}
     </div>
 
-    <div class="form-group">
-      <button type="button" data-action="revertNameplates">{{localize "NAMEPLATES.CONFIG.REVERT.LABEL"}}</button>
-      <p class="hint">{{localize "NAMEPLATES.CONFIG.REVERT.HINT"}}</p>
-    </div>
+    {{#if showTokenOverrides}}
+      <div class="form-group">
+        <label for="{{idPrefix}}-nameplates-override">{{localize "NAMEPLATES.CONFIG.TOKENOVERRIDE.LABEL"}}</label>
+        <input type="checkbox" id="{{idPrefix}}-nameplates-override" name="nameplates.useTokenOverride" {{checked useTokenOverride}}>
+        <p class="hint">{{localize "NAMEPLATES.CONFIG.TOKENOVERRIDE.HINT"}}</p>
+      </div>
+      <button type="button" data-action="loadFromActor"{{#unless useTokenOverride}} style="display:none"{{/unless}}>{{localize "NAMEPLATES.CONFIG.LOADFROMACTOR"}}</button>
+      <button type="button" data-action="loadFromToken"{{#if useTokenOverride}} style="display:none"{{/if}}>{{localize "NAMEPLATES.CONFIG.LOADFROMTOKEN"}}</button>
+    {{else}}
+      <input type="checkbox" id="{{idPrefix}}-nameplates-override" name="nameplates.useTokenOverride" checked style="display:none">
+    {{/if}}
     
     <div class="form-group">
       <div class="flexrow">

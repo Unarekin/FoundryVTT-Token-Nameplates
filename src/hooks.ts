@@ -1,6 +1,6 @@
-import { DeepPartial, PropsOfType } from "types";
-import { NameplateToken } from "./NameplateToken";
+import { NameplatePlaceable } from "types";
 import { TokenConfigMixin } from "./applications";
+import { NameplateTokenMixin } from "./placeables"
 
 Hooks.once("canvasReady", () => {
   // Initialize Pixi DevTools if we are a debug build
@@ -13,80 +13,33 @@ Hooks.once("canvasReady", () => {
   }
 });
 
-function upsertNameplate(document: TokenDocument): NameplateToken {
-  const index = TokenNameplates.tokens.findIndex(item => item.token === document);
-  if (index > -1) return TokenNameplates.tokens[index];
-  const nameplate = new NameplateToken(document);
-  TokenNameplates.tokens.push(nameplate);
-  return nameplate;
-}
+Hooks.once("init", () => {
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-function simpleWrapper<t extends keyof PropsOfType<NameplateToken, Function>>(funcName: t): (this: foundry.canvas.placeables.Token, wrapped: Function, ...args: unknown[]) => any {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  return function (this: foundry.canvas.placeables.Token, wrapped: Function, ...args: unknown[]) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-    const retVal = wrapped(...args);
-    if (retVal instanceof Promise) {
-      return retVal
-        .then(val => {
-          const nameplateToken = upsertNameplate(this.document);
+  game.TokenNameplates = {
+    refreshAllTokens() { canvas?.scene?.tokens.forEach((token: TokenDocument) => { (token.object as NameplatePlaceable | null)?.refreshNameplates(); }) },
+    refreshTokensWithPrototype(prototype: foundry.data.PrototypeToken) {
+      canvas?.scene?.tokens.forEach((token: TokenDocument) => {
+        if (token.actor?.prototypeToken === prototype) (token.object as unknown as NameplatePlaceable).refreshNameplates(true);
+      })
+    },
+    classes: {
 
-          if (nameplateToken) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            (nameplateToken as any)[funcName]();
-          }
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          return val;
-        })
-    } else {
-      const nameplateToken = upsertNameplate(this.document);
-      if (nameplateToken) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-        (nameplateToken as any)[funcName]();
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return retVal;
     }
   }
-}
 
-Hooks.once("ready", () => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  libWrapper.register(__MODULE_ID__, "foundry.canvas.placeables.Token.prototype._draw", simpleWrapper("draw"));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  libWrapper.register(__MODULE_ID__, "foundry.canvas.placeables.Token.prototype._refreshState", simpleWrapper("refreshState"));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  libWrapper.register(__MODULE_ID__, "foundry.canvas.placeables.Token.prototype._refreshSize", simpleWrapper("refreshSize"));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  libWrapper.register(__MODULE_ID__, "foundry.canvas.placeables.Token.prototype._destroy", simpleWrapper("destroy"));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  libWrapper.register(__MODULE_ID__, "foundry.canvas.placeables.Token.prototype._refreshNameplate", simpleWrapper("refreshNameplate"));
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  libWrapper.register(__MODULE_ID__, "foundry.canvas.placeables.Token.prototype._refreshTooltip", simpleWrapper("refreshTooltip"));
+
+  const NameplateToken = NameplateTokenMixin<typeof foundry.canvas.placeables.Token>(CONFIG.Token.objectClass);
+
+  CONFIG.Token.objectClass = NameplateToken;
+
+
+  game.TokenNameplates.classes.NameplateToken = NameplateToken;
 
 });
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-(Hooks as any).on("updateToken", (doc: TokenDocument, delta: DeepPartial<TokenDocument>) => {
-  const nameplate = doc.object ? TokenNameplates.tokens.find(nameplate => nameplate.token === doc) : undefined;
-  if (nameplate instanceof NameplateToken) nameplate.tokenUpdated(delta);
-});
-
-// // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unused-vars
-// (Hooks as any).on("refreshToken", (token: foundry.canvas.placeables.Token, options: unknown) => {
-//   const nameplate = TokenNameplates.tokens.find(nameplate => nameplate.token?.object === token);
-//   if (nameplate instanceof NameplateToken) nameplate.refreshNameplate();
-// });
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-(Hooks as any).on("updateActor", (actor: Actor, delta: DeepPartial<Actor>) => {
-  const nameplate = TokenNameplates.tokens.find(nameplate => nameplate.actor === actor);
-  if (nameplate instanceof NameplateToken) nameplate.actorUpdated(delta);
-})
 
 Hooks.once("ready", () => {
   // Apply token configuration mixin.
+
 
   const entries = Object.entries(CONFIG.Token.sheetClasses.base);
   for (const [key, { cls }] of entries) {
@@ -98,4 +51,18 @@ Hooks.once("ready", () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   CONFIG.Token.prototypeSheetClass = TokenConfigMixin(CONFIG.Token.prototypeSheetClass as any);
-})
+
+});
+
+Hooks.on("updateActor", (actor: Actor) => {
+  canvas?.scene?.tokens.forEach((token) => {
+    if (token.object && token.actor === actor)
+      (token.object as unknown as NameplatePlaceable).refreshNameplates(true);
+  });
+});
+
+Hooks.on("updateToken", (token: TokenDocument) => {
+  if (token.object)
+    (token.object as unknown as NameplatePlaceable).refreshNameplates(true);
+});
+

@@ -355,6 +355,7 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
 
 
     context.nameplates = foundry.utils.deepClone(this.#config);
+    context.nameplates.showTokenOverrides = false;
     foundry.utils.mergeObject(context.nameplates, this.#config)
 
     context.nameplates.upperNameplates = context.nameplates.nameplates.filter(plate => plate.position === "top");

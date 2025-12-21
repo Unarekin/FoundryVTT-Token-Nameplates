@@ -1,24 +1,20 @@
 import { ActorTypeSelectionApplication } from "applications"
-import { NameplateConfiguration, SerializedNameplate } from "types"
+import { NameplateConfiguration, NameplateDisplay, SerializedNameplate } from "types"
 
-declare global {
-  interface SettingsConfig {
-    [__MODULE_ID__]: {
-      globalConfigurations: Record<string, NameplateConfiguration>
-    } // Placeholder for later
-  }
-
-  interface FlagConfig {
-    Actor: {
-      [__MODULE_ID__]: NameplateConfiguration
-    }
-  }
+export const TokenDisplayHash: Record<number, NameplateDisplay> = {
+  50: "always",
+  10: "control",
+  30: "hover",
+  0: "none",
+  40: "owner",
+  20: "ownerHover"
 }
 
 export const DefaultSettings: NameplateConfiguration = {
   enabled: true,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   version: __MODULE_VERSION__ as any,
+  useTokenOverride: false,
   nameplates: []
 }
 
@@ -67,6 +63,18 @@ Hooks.once("ready", () => {
     restricted: true
   });
 
+  game.settings?.register(__MODULE_ID__, "invertIsometryTransform", {
+    name: "Invert Isometry",
+    label: game.i18n?.localize("NAMEPLATES.SETTINGS.INVERTISOMETRY.LABEL"),
+    hint: game.i18n?.localize("NAMEPLATES.SETTINGS.INVERTISOMETRY.HINT") ?? "",
+    scope: "world",
+    requiresReload: false,
+    type: Boolean,
+    default: false,
+    config: !!game.modules.get("isometric-perspective")?.active,
+    onChange() { game?.TokenNameplates?.refreshAllTokens(); }
+  })
+
   game.settings?.register(__MODULE_ID__, "globalConfigurations", {
     name: "Global Configurations",
     hint: "",
@@ -75,6 +83,6 @@ Hooks.once("ready", () => {
     requiresReload: false,
     type: Object,
     default: {},
-    onChange() { TokenNameplates.tokens.forEach(token => token.actorUpdated({})); }
+    onChange() { game?.TokenNameplates?.refreshAllTokens(); }
   })
 })

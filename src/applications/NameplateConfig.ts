@@ -3,9 +3,9 @@
 
 
 import { NameplateConfigContext, NameplateConfigConfiguration } from "./types";
-import { DeepPartial, SerializedNameplate } from "../types";
+import { DeepPartial, NameplatePlaceable, SerializedNameplate } from "../types";
 import { generateDisplaySelectOptions, generateFontSelectOptions } from "./functions";
-import { getAutocompleteValue, getDefaultNameplate, getInterpolationData, getKeys } from "functions";
+import { getAutocompleteValue, getDefaultNameplate, getKeys } from "functions";
 
 export class NameplateConfigApplication extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2<NameplateConfigContext, NameplateConfigConfiguration>) {
 
@@ -202,8 +202,10 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     if (valueInput instanceof HTMLInputElement) {
 
       let suggestionKeys: string[] = [];
-      if (this.object)
-        suggestionKeys = Object.keys(getInterpolationData(this.object));
+      if (this.object instanceof TokenDocument)
+        suggestionKeys = Object.keys((this.object.object as unknown as NameplatePlaceable).getInterpolationData());
+      else if (this.object instanceof foundry.data.PrototypeToken)
+        suggestionKeys = Object.keys(this.object);
       else if (this.#actorType)
         suggestionKeys = getKeys(this.#actorType);
 

@@ -1,9 +1,8 @@
-import { getInterpolationData, interpolate, confirm, serializeStyle, getDefaultNameplate, getDefaultSettings, downloadJSON, uploadJSON } from "functions";
-import { DeepPartial, NameplateConfiguration, NameplatePosition, SerializedNameplate } from "../types";
+import { interpolate, confirm, serializeStyle, getDefaultNameplate, getDefaultSettings, downloadJSON, uploadJSON, getPrototypeTokenInterpolationData } from "functions";
+import { DeepPartial, NameplateConfiguration, NameplatePosition, SerializedNameplate, NameplatePlaceable } from "../types";
 import { generateFontSelectOptions } from "./functions";
 import { LocalizedError } from "../errors";
 import { NameplateConfigApplication } from "./NameplateConfig";
-import { DefaultSettings } from "settings";
 
 
 export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenConfig) {
@@ -25,7 +24,19 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         removeNameplate: TokenConfiguration.RemoveNameplate,
         // eslint-disable-next-line @typescript-eslint/unbound-method
         revertNameplates: TokenConfiguration.RevertNameplates,
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        loadFromActor: TokenConfiguration.LoadFromActor,
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        loadFromToken: TokenConfiguration.LoadFromToken
       }
+    }
+
+    static async LoadFromActor(this: TokenConfiguration) {
+      await this.loadFromActor();
+    }
+
+    static async LoadFromToken(this: TokenConfiguration) {
+      await this.loadFromToken();
     }
 
     static async MoveNameplateUp(this: TokenConfiguration, e: PointerEvent, elem: HTMLElement) {
@@ -174,23 +185,41 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
     async _onSubmitForm(formConfig: foundry.applications.api.ApplicationV2.FormConfiguration, event: Event | SubmitEvent): Promise<void> {
       if (!this.form) return;
       if (this.#hasChanges) {
-        const data = foundry.utils.expandObject(new foundry.applications.ux.FormDataExtended(this.form).object) as Record<string, unknown>;
-
+        const data = foundry.utils.expandObject(new foundry.applications.ux.FormDataExtended(this.form).object) as DeepPartial<NameplateConfiguration>;
         const config: NameplateConfiguration = {
-          ...DefaultSettings,
+          ...getDefaultSettings(),
           ...(this.#flags ?? {}),
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          enabled: (data.nameplates as any)?.enabled ?? true,
+          ...data.nameplates,
           nameplates: Array.isArray(this.#flags?.nameplates) ? foundry.utils.deepClone(this.#flags.nameplates) : []
         };
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const actor = ((this as any).token as foundry.canvas.placeables.Token).actor as Actor | undefined;
-        actor?.update({
+        const doc = ((this as any).isPrototype ? (this as any).actor : config.useTokenOverride ? this.document : (this as any).actor) as Actor | TokenDocument | undefined;
+
+        console.log("Config:", config, doc);
+
+        if (!doc) return;
+
+        doc?.update({
           flags: {
             [__MODULE_ID__]: config
           }
         })
+          .then(() => {
+            if (this.document)
+              return this.document.setFlag(__MODULE_ID__, "useTokenOverride", config.useTokenOverride)
+          })
+          .then(() => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if ((this as any).token instanceof TokenDocument) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              ((this as any).token.object as unknown as NameplatePlaceable).refreshNameplates(true);
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            } else if ((this as any).token instanceof foundry.data.PrototypeToken) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              game?.TokenNameplates?.refreshTokensWithPrototype((this as any).token as foundry.data.PrototypeToken);
+            }
+          })
           .then(() => { this.#hasChanges = false; })
           .catch((err: Error) => {
             console.error(err);
@@ -270,12 +299,57 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       }
     }
 
+    protected async loadFromActor() {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const actor = (this as any).actor as Actor | undefined;
+      if (!(actor instanceof Actor)) return;
+
+      const settings = foundry.utils.deepClone(getDefaultSettings());
+      if (actor.flags[__MODULE_ID__])
+        foundry.utils.mergeObject(settings, (actor.flags[__MODULE_ID__] as DeepPartial<NameplateConfiguration>));
+
+      const useOverride = this.element.querySelector(`[name="nameplates.useTokenOverride"]`);
+      if (useOverride instanceof HTMLInputElement)
+        settings.useTokenOverride = useOverride.checked;
+
+      console.log("Loading from actor:", settings);
+      this.#flags = foundry.utils.deepClone(settings);
+      await this.render();
+    }
+
+    protected async loadFromToken() {
+      if (!this.document) return;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const flags = (this.document as any).flags[__MODULE_ID__] as DeepPartial<NameplateConfiguration>;
+      const settings = foundry.utils.deepClone(getDefaultSettings());
+      if (flags) foundry.utils.mergeObject(settings, flags);
+
+      const useOverride = this.element.querySelector(`[name="nameplates.useTokenOverride"]`);
+      if (useOverride instanceof HTMLInputElement)
+        settings.useTokenOverride = useOverride.checked;
+
+      console.log("Loading from token:", settings);
+      this.#flags = foundry.utils.deepClone(settings);
+      await this.render();
+    }
+
     async _onRender(context: TokenConfig.RenderContext, options: foundry.applications.api.DocumentSheetV2.RenderOptions) {
       await super._onRender(context, options);
 
       const enable = this.element.querySelector(`[name="nameplates.enabled"]`);
-      if (enable instanceof HTMLInputElement) {
+      if (enable instanceof HTMLInputElement)
         enable.addEventListener("change", () => { this.#hasChanges = true; })
+
+      const overrides = this.element.querySelector(`[name="nameplates.useTokenOverride"]`);
+      if (overrides instanceof HTMLInputElement) {
+        overrides.addEventListener("change", () => {
+          this.#hasChanges = true;
+          if (overrides.checked) {
+            void this.loadFromToken();
+          } else {
+            void this.loadFromActor();
+          }
+        });
       }
 
 
@@ -327,10 +401,20 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
     }
 
     private nameplatesByPosition(position: NameplatePosition): SerializedNameplate[] {
+      const interpolationData = {};
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const token = (this as any).token as TokenDocument | foundry.data.PrototypeToken;
+
+      if (token instanceof TokenDocument)
+        foundry.utils.mergeObject(interpolationData, (token.object as unknown as NameplatePlaceable).getInterpolationData());
+      else if (token instanceof foundry.data.PrototypeToken)
+        foundry.utils.mergeObject(interpolationData, getPrototypeTokenInterpolationData(token));
+
+
+
       return (this.#flags?.nameplates ?? []).filter(plate => plate.position === position).map(nameplate => ({
         ...nameplate,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-        actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
+        actualValue: interpolate(nameplate.value, interpolationData)
       }));
     }
 
@@ -338,31 +422,31 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       const context = await super._prepareContext(options);
 
 
-
       if (options.force || options.isFirstRender || !this.#flags) {
+
         const defaultSettings = getDefaultSettings();
-        this.#flags = foundry.utils.mergeObject(
-          foundry.utils.deepClone(defaultSettings),
+        this.#flags = foundry.utils.deepClone(defaultSettings);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const actor = (this as any).actor as Actor | undefined;
+        const useOverrides = this.document ? this.document.getFlag(__MODULE_ID__, "useTokenOverride") : false;
+
+
+        if (!useOverrides && actor instanceof Actor) {
+          foundry.utils.mergeObject(this.#flags, actor.flags[__MODULE_ID__] as DeepPartial<NameplateConfiguration>);
+        } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          ((this as any).actor.flags[__MODULE_ID__] ?? {}),
-        ) as NameplateConfiguration;
+          foundry.utils.mergeObject(this.#flags, (this.document.flags as any)[__MODULE_ID__] as DeepPartial<NameplateConfiguration>);
+        }
+
         // Re-inject nameplates if there are none
         if (!this.#flags.nameplates.length) this.#flags.nameplates.push(...defaultSettings.nameplates);
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (context as any).nameplates = {
-        enabled: this.#flags?.enabled ?? true,
-        // upperNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "top").map(nameplate => ({
-        //   ...nameplate,
-        //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-        //   actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
-        // })),
-        // lowerNameplates: (this.#flags?.nameplates ?? []).filter(plate => plate.position === "bottom").map(nameplate => ({
-        //   ...nameplate,
-        //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-        //   actualValue: interpolate(nameplate.value, getInterpolationData((this as any).token))
-        // })),
+        ...getDefaultSettings(),
+        ...(this.#flags ?? {}),
+        showTokenOverrides: !!this.document,
         upperNameplates: this.nameplatesByPosition("top"),
         lowerNameplates: this.nameplatesByPosition("bottom"),
         rightNameplates: this.nameplatesByPosition("right"),

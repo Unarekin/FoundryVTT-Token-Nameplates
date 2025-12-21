@@ -129,6 +129,8 @@
         "UPLOAD": "Upload JSON"
       },
       "LEFT": "Left Nameplates",
+      "LOADFROMACTOR": "Load Settings from Actor",
+      "LOADFROMTOKEN": "Load Settings from Token",
       "LOWER": "Lower Nameplates",
       "PADDING": {
         "HINT": "Space above and to the left of the nameplate",
@@ -163,6 +165,10 @@
         "OUTLINE": "Outline"
       },
       "TITLE": "Configure Nameplate",
+      "TOKENOVERRIDE": {
+        "HINT": "If enabled, will store settings on this token rather than its actor.",
+        "LABEL": "Enable Token Overrides"
+      },
       "TOOLTIPS": {
         "ADD": "Add nameplate",
         "DOWN": "Move nameplate down",
