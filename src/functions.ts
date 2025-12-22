@@ -15,9 +15,13 @@ export function stripHTML(val: string): string {
  */
 export function interpolate(text: string, data: Record<string, unknown>, strip = false): string {
   const reg = /{[^}]+}/g;
-  return (strip ? stripHTML(text) : text).replace(reg, k => {
-    return (data[k.slice(1, -1)] ?? "") as string;
-  })
+  return (strip ? stripHTML(text) : text).replace(reg, key => {
+    const val = foundry.utils.getProperty(data, key.slice(1, -1));
+    if (val === undefined || val === null) return "";
+
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
+    return String(val);
+  });
 }
 
 function getSchemaKeys(model: typeof foundry.abstract.DataModel): string[] {
@@ -72,6 +76,7 @@ export function getDefaultSettings(): NameplateConfiguration {
     enabled: false,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     version: __MODULE_VERSION__ as any,
+    useTokenOverride: false,
     nameplates: [
       {
         ...getDefaultNameplate(),
@@ -150,11 +155,52 @@ export function getAutocompleteValue(text: string): string {
   return split[split.length - 1];
 }
 
+/**
+ * Recursively flatten an object.
+ * foundry.utils.flattenObject does not handle class instances,
+ * which gums things up with auto completion suggestions
+ * @param obj 
+ */
+export function deepFlatten(obj: Record<string, unknown>): Record<string, unknown> {
+  const maxDepth = 100;
+  const output: Record<string, unknown> = {};
+  // We pass an array of visited objects to prevent circular references within
+  // a given property hierarchy, but to allow referring to the same object in sibling leafs
+  // Mostly for the 'actor.system' and 'system' properties, tbh.
+  function step(object: Record<string, unknown>, prev = "", currentDepth = 1, objects: object[]=[]) {
+    Object.keys(object).forEach(key => {
+      if (!key.startsWith("_")) {
+        const value = object[key];
+          const type = Object.prototype.toString.call(value);
+          const isObject = type === "[object Object]" || type === "[object Array]";
+          const newKey = prev ? `${prev}.${key}` : key;
+          if (!objects.includes(value as object) && !Array.isArray(value) && isObject && Object.keys(value as Record<string, unknown>).length && currentDepth < maxDepth)
+            return step(value as Record<string, unknown>, newKey, currentDepth + 1, [...objects, ...(isObject ? [value as object] : [])]);
+          output[newKey] = value;
+      }
+    });
+  }
+
+  step(obj);
+  return output;
+}
+
+export function getInterpolationKeys(obj: Record<string, unknown>): string[] {
+  return Object.keys(deepFlatten(obj));
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getAutocompleteSuggestions(token: TokenDocument | Actor, text: string): string[] {
-  return [];
-  // return Object.keys(getInterpolationData(token))
-  //   .filter(key => key.startsWith(text));
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  return Object.keys(deepFlatten(token as any));
+}
+
+export function getActorInterpolationData(actor: Actor): Record<string, unknown> {
+  return {
+    actor,
+    system: actor.system,
+    flags: actor.flags
+  }
 }
 
 export function getPrototypeTokenInterpolationData(token: foundry.data.PrototypeToken): Record<string, unknown> {

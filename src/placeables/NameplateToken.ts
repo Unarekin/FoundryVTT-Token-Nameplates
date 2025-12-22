@@ -1,5 +1,6 @@
 import { NameplatePlaceable } from "types";
-import { NameplatePlaceableMixin } from "./NameplatePlaceable"
+import { NameplatePlaceableMixin } from "./NameplatePlaceable";
+import { getActorInterpolationData } from "functions";
 
 export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.Token>(base: t) {
   return class NameplateToken extends NameplatePlaceableMixin<t>(base) {
@@ -17,17 +18,17 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
 
 
     protected getInterpolationData() {
-      const data: Record<string, unknown> = this.document.toObject() as Record<string, unknown>
-      if (this.tooltip?.text) data.tooltip = this.tooltip.text;
+      const data: Record<string, unknown> = {};
+      foundry.utils.mergeObject(data, this.document);;
+      
+      if (this.document.system)
+        foundry.utils.mergeObject(data, this.document.system);
+      foundry.utils.mergeObject(data, { flags: this.document.flags });
 
-      if (this.actor) {
-        foundry.utils.mergeObject(data, {
-          actor: this.actor.toObject(),
-          system: this.actor.system
-        });
-      }
+      if (this.actor)
+        foundry.utils.mergeObject(data, getActorInterpolationData(this.actor));
 
-      return foundry.utils.flattenObject(data);
+      return data;
     }
 
     protected _refreshNameplate() {

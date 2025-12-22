@@ -5,7 +5,7 @@
 import { NameplateConfigContext, NameplateConfigConfiguration } from "./types";
 import { DeepPartial, NameplatePlaceable, SerializedNameplate } from "../types";
 import { generateDisplaySelectOptions, generateFontSelectOptions } from "./functions";
-import { getAutocompleteValue, getDefaultNameplate, getKeys } from "functions";
+import { getAutocompleteValue, getDefaultNameplate, getInterpolationKeys, getKeys } from "functions";
 
 export class NameplateConfigApplication extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2<NameplateConfigContext, NameplateConfigConfiguration>) {
 
@@ -202,8 +202,8 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     if (valueInput instanceof HTMLInputElement) {
 
       let suggestionKeys: string[] = [];
-      if (this.object instanceof TokenDocument)
-        suggestionKeys = Object.keys((this.object.object as unknown as NameplatePlaceable).getInterpolationData());
+      if (this.object && (this.object?.object as unknown as NameplatePlaceable)?.getInterpolationData)
+        suggestionKeys = getInterpolationKeys((this.object?.object as unknown as NameplatePlaceable).getInterpolationData());
       else if (this.object instanceof foundry.data.PrototypeToken)
         suggestionKeys = Object.keys(this.object);
       else if (this.#actorType)
@@ -225,9 +225,7 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
         },
         source: (req: { term: string }, res: ((values: string[]) => void)) => {
           const value = getAutocompleteValue(req.term);
-
           if (value) {
-            // const suggestions = suggestionKeys.filter(key => key.toLowerCase().startsWith(value.toLowerCase()));
             const regex = new RegExp($.ui.autocomplete.escapeRegex(value), "i");
             res($.grep(suggestionKeys, item => regex.test(item)));
           } else {
