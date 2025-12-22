@@ -202,7 +202,7 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     if (valueInput instanceof HTMLInputElement) {
 
       let suggestionKeys: string[] = [];
-      if (this.object && (this.object?.object as unknown as NameplatePlaceable).getInterpolationData)
+      if (this.object && (this.object?.object as unknown as NameplatePlaceable)?.getInterpolationData)
         suggestionKeys = getInterpolationKeys((this.object?.object as unknown as NameplatePlaceable).getInterpolationData());
       else if (this.object instanceof foundry.data.PrototypeToken)
         suggestionKeys = Object.keys(this.object);
