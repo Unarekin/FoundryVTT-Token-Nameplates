@@ -157,6 +157,14 @@
         "TITLE": "Revert Settings"
       },
       "RIGHT": "Right Nameplates",
+      "SOURCE": {
+        "ACTOR": "This item currently uses settings from its <strong>actor</strong>",
+        "ACTORTYPE": "This item currently uses settings from its <strong> actor type ({actorType})</strong>",
+        "DEFAULT": "This item uses the built-in <strong>default</strong> settings",
+        "GLOBAL": "This item currently uses the <strong>global</strong> settings",
+        "TILE": "This item uses settings from its <strong>tile</strong.",
+        "TOKEN": "This item uses settings from its <strong>token</strong>"
+      },
       "TABS": {
         "BASICS": "Basics",
         "EFFECTS": "Effects",

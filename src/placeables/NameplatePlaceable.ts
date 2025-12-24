@@ -1,4 +1,4 @@
-import { IsometricFlags, NameplateConfiguration } from "types";
+import { IsometricFlags, NameplateConfiguration, NameplateConfigurationSource } from "types";
 import { Nameplate } from "./Nameplate";
 import { getNameplateSettings } from "functions";
 
@@ -21,6 +21,7 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     public get leftNameplates() { return this.nameplates.filter(nameplate => nameplate.nameplatePosition === "left"); }
     public get rightNameplates() { return this.nameplates.filter(nameplate => nameplate.nameplatePosition === "right"); }
 
+    public abstract get nameplateConfigSource(): NameplateConfigurationSource;
 
     protected abstract getInterpolationData(): Record<string, unknown>;
     protected abstract getFlagDocument(): foundry.abstract.Document.Any;

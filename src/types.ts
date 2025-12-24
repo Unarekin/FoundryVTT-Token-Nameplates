@@ -1,6 +1,8 @@
 
 type Version = "1.1.0";
 
+export const NameplateConfigurationSources = ["token", "actor", "actorType", "global", "tile", "default"] as const;
+export type NameplateConfigurationSource = typeof NameplateConfigurationSources[number];
 
 export type IsObject<T> = T extends Readonly<Record<string, any>>
   ? T extends AnyArray | AnyFunction
@@ -42,6 +44,7 @@ export type NameplateDisplay = typeof NameplateDisplayOptions[number];
 export interface NameplatePlaceable {
   refreshNameplates: (force?: boolean) => void;
   getInterpolationData: () => Record<string, unknown>;
+  nameplateConfigSource: NameplateConfigurationSource;
 }
 
 export interface SerializedNameplate {
@@ -100,5 +103,5 @@ export interface IsometricFlags {
   offsetX: number;
   offsetY: number;
   scale: number;
-  isoTokenDisabled;
+  isoTokenDisabled: boolean;
 }

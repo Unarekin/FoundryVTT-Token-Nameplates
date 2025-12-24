@@ -1,5 +1,6 @@
 <div class="tab{{#if tab.active}} active{{/if}} token-nameplates-config" data-group="sheet" data-tab="nameplates" data-application-part="nameplates" style="overflow-y:auto;overflow-x:hidden">
   {{#with nameplates}}
+    <p class="hint">{{{configSourceDescription}}}</p>
     <div class="form-group">
       {{#if ../globalConfig }}
         <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLEGLOBAL.LABEL"}}</label>

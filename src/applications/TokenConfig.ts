@@ -443,6 +443,10 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const token = ((this as any).token as TokenDocument | undefined)?.object as NameplatePlaceable | undefined;
+      console.log(this);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (context as any).nameplates = {
         ...getDefaultSettings(),
         ...(this.#flags ?? {}),
@@ -454,8 +458,40 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         idPrefix: (this as any).token instanceof foundry.canvas.placeables.Token ? (this as any).token.uuid.replaceAll(".", "-") : `prototype-${(this as any).actor.uuid.replaceAll(".", "-")}`,
         // idPrefix: (this as any).token.uuid.replaceAll(".", "-"),
-        fontSelect: generateFontSelectOptions()
+        fontSelect: generateFontSelectOptions(),
+
+        configSource: token?.nameplateConfigSource,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        actorType: (this as any).actor?.type,
       }
+
+      switch (token?.nameplateConfigSource) {
+        case "actor":
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (context as any).nameplates.configSourceDescription = game?.i18n?.localize("NAMEPLATES.CONFIG.SOURCE.ACTOR");
+          break;
+        case "token":
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (context as any).nameplates.configSourceDescription = game?.i18n?.localize("NAMEPLATES.CONFIG.SOURCE.TOKEN");
+          break;
+        case "tile":
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (context as any).nameplates.configSourceDescription = game?.i18n?.localize("NAMEPLATES.CONFIG.SOURCE.TILE");
+          break;
+        case "actorType":
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+          (context as any).nameplates.configSourceDescription = game?.i18n?.format("NAMEPLATES.CONFIG.SOURCE.ACTORTYPE", { actorType: (this as any).actor?.type });
+          break;
+        case "global":
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (context as any).nameplates.configSourceDescription = game?.i18n?.localize("NAMEPLATES.CONFIG.SOURCE.GLOBAL");
+          break;
+        default:
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (context as any).nameplates.configSourceDescription = game?.i18n?.localize("NAMEPLATES.CONFIG.SOURCE.DEFAULT");
+          break;
+      }
+
 
       return context;
     }
