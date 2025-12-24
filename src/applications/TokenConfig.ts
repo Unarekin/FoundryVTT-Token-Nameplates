@@ -196,8 +196,6 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const doc = ((this as any).isPrototype ? (this as any).actor : config.useTokenOverride ? this.document : (this as any).actor) as Actor | TokenDocument | undefined;
 
-        console.log("Config:", config, doc);
-
         if (!doc) return;
 
         doc?.update({
@@ -312,7 +310,6 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       if (useOverride instanceof HTMLInputElement)
         settings.useTokenOverride = useOverride.checked;
 
-      console.log("Loading from actor:", settings);
       this.#flags = foundry.utils.deepClone(settings);
       await this.render();
     }
@@ -328,7 +325,6 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
       if (useOverride instanceof HTMLInputElement)
         settings.useTokenOverride = useOverride.checked;
 
-      console.log("Loading from token:", settings);
       this.#flags = foundry.utils.deepClone(settings);
       await this.render();
     }
@@ -444,7 +440,6 @@ export function TokenConfigMixin(Base: typeof foundry.applications.sheets.TokenC
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const token = ((this as any).token as TokenDocument | undefined)?.object as NameplatePlaceable | undefined;
-      console.log(this);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       (context as any).nameplates = {

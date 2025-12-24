@@ -35,7 +35,6 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
     if (!token) return new PIXI.Color("white");
 
     const disposition = Object.entries(CONST.TOKEN_DISPOSITIONS).find(([, val]) => val === token.disposition)?.[0] ?? CONST.TOKEN_DISPOSITIONS.NEUTRAL;
-    console.log("Disposition:", token.disposition, disposition)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const color = (CONFIG.Canvas.dispositionColors as any)[disposition as any] as PIXI.ColorSource;

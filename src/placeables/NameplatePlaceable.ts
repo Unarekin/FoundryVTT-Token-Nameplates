@@ -1,4 +1,4 @@
-import { IsometricFlags, NameplateConfiguration, NameplateConfigurationSource } from "types";
+import { IsometricFlags, NameplateConfiguration, NameplateConfigurationSource, NameplateDisplay } from "types";
 import { Nameplate } from "./Nameplate";
 import { getNameplateSettings } from "functions";
 
@@ -56,10 +56,9 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
 
     protected getPlateWrapWidth() { return this.bounds.width * 2.5; }
 
-    protected shouldDisplay(plate: Nameplate): boolean {
-      const display = plate.display ?? "default" // === "default" ? TokenDisplayHash[this.document.displayName] : plate.display;
+    protected displayMode(plate: Nameplate): NameplateDisplay { return plate.display ?? "default"; }
 
-
+    protected displayConditionsMet(display: NameplateDisplay): boolean {
       switch (display) {
         case "always":
           return true;
@@ -72,6 +71,12 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
         default:
           return false;
       }
+    }
+
+    protected shouldDisplay(plate: Nameplate): boolean {
+      const display = this.displayMode(plate);
+      console.log("Display mode:", display);
+      return this.displayConditionsMet(display);
     }
 
     protected get shouldInvertIsometry() {

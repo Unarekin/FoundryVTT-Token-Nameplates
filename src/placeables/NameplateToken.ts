@@ -1,6 +1,8 @@
-import { NameplateConfiguration, NameplateConfigurationSource, NameplatePlaceable } from "types";
+import { NameplateConfiguration, NameplateConfigurationSource, NameplateDisplay, NameplatePlaceable } from "types";
 import { NameplatePlaceableMixin } from "./NameplatePlaceable";
 import { getActorInterpolationData, getDefaultSettings, getNameplateSettings } from "functions";
+import { Nameplate } from "./Nameplate";
+import { TokenDisplayHash } from "settings";
 
 export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.Token>(base: t) {
   return class NameplateToken extends NameplatePlaceableMixin<t>(base) {
@@ -12,29 +14,32 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
       return this.document.actor ?? this.document;
     }
 
+    protected displayMode(plate: Nameplate): NameplateDisplay {
+      const display = plate.display ?? "default";
+      if (display === "default") {
+        console.log("Default display mode:", TokenDisplayHash[this.document.displayName])
+        return TokenDisplayHash[this.document.displayName];
+      } else {
+        return display;
+      }
+    }
+
+
     public get nameplateConfigSource(): NameplateConfigurationSource {
-      console.log("Getting config source:");
-      if (this.document.getFlag(__MODULE_ID__, "useTokenOverride") && this.document.getFlag(__MODULE_ID__, "enabled")) {
-        console.log("Token", this.document.flags[__MODULE_ID__]);
+      if (this.document.getFlag(__MODULE_ID__, "useTokenOverride") && this.document.getFlag(__MODULE_ID__, "enabled"))
         return "token";
-      }
-      else if (this.actor?.getFlag(__MODULE_ID__, "enabled")) {
-        console.log("actor", this.actor?.flags[__MODULE_ID__])
+      else if (this.actor?.getFlag(__MODULE_ID__, "enabled"))
         return "actor";
-      }
+
 
       const globalConfig = (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) as Record<string, NameplateConfiguration>;
-      if (this.actor && globalConfig[this.actor.type]?.enabled) {
-        console.log("actorType", globalConfig[this.actor.type]);
+      if (this.actor && globalConfig[this.actor.type]?.enabled)
         return "actorType";
-      }
-      
-      if (globalConfig.global?.enabled) {
-      console.log("global", globalConfig.global);
-      return "global";
-      }
 
-      console.log("default", getDefaultSettings());
+
+      if (globalConfig.global?.enabled)
+        return "global";
+
       return "default"
     }
 
