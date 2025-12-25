@@ -75,7 +75,6 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
 
     protected shouldDisplay(plate: Nameplate): boolean {
       const display = this.displayMode(plate);
-      console.log("Display mode:", display);
       return this.displayConditionsMet(display);
     }
 
@@ -116,16 +115,13 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
 
       for (const plate of sorted) {
         if (this.shouldDisplay(plate)) {
-
-
-
           plate.visible = true;
           if (up)
-            y -= (plate.height) + this.padding;
+            y -= (plate.height) + this.padding + plate.padding.y;
 
           plate.y = y;
           if (!up)
-            y += (plate.height) + this.padding;
+            y += (plate.height) + this.padding + plate.padding.y;
 
           plate.style.wordWrap = true;
           plate.style.wordWrapWidth = this.getPlateWrapWidth();
@@ -135,15 +131,15 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
             case "left":
             case "justify":
               if (plate.autoAnchor) plate.anchor.x = 0;
-              plate.x = ((width / 2) - (plate.style.wordWrapWidth / 2)) - xAdjust;
+              plate.x = ((width / 2) - (plate.style.wordWrapWidth / 2)) - xAdjust + plate.padding.x;
               break;
             case "right":
               if (plate.autoAnchor) plate.anchor.x = 1;
-              plate.x = ((width / 2) + (plate.style.wordWrapWidth / 2)) - xAdjust;
+              plate.x = ((width / 2) + (plate.style.wordWrapWidth / 2)) - xAdjust + plate.padding.x;
               break;
             default:
               if (plate.autoAnchor) plate.anchor.x = 0.5;
-              plate.x = (width / 2) - xAdjust
+              plate.x = (width / 2) - xAdjust + plate.padding.x
           }
 
         } else {

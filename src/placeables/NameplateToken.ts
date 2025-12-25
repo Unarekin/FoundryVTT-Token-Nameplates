@@ -17,7 +17,6 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
     protected displayMode(plate: Nameplate): NameplateDisplay {
       const display = plate.display ?? "default";
       if (display === "default") {
-        console.log("Default display mode:", TokenDisplayHash[this.document.displayName])
         return TokenDisplayHash[this.document.displayName];
       } else {
         return display;
