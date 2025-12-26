@@ -64,6 +64,10 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
           return true;
         case "none":
           return false;
+        case "owner":
+          return this.isOwner;
+        case "control":
+          return this.controlled;
         case "ownerHover":
           return this.isOwner && this.hover;
         case "hover":
