@@ -285,6 +285,9 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       this.addChild(this.rightContainer);
       this.addChild(this.leftContainer);
 
+      this.topContainer.zIndex = this.bottomContainer.zIndex = this.leftContainer.zIndex = this.rightContainer.zIndex = 1;
+      
+
       void this.refreshNameplates(true);
     }
   }
