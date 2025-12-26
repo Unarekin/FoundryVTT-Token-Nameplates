@@ -24,14 +24,14 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     public abstract get nameplateConfigSource(): NameplateConfigurationSource;
 
     protected abstract getInterpolationData(): Record<string, unknown>;
-    protected abstract getFlagDocument(): foundry.abstract.Document.Any;
-    protected getFlags(): NameplateConfiguration { return getNameplateSettings(this.getFlagDocument()); }
+    protected abstract getNameplateDocument(): foundry.abstract.Document.Any;
+    protected getNameplateFlags(): NameplateConfiguration { return getNameplateSettings(this.getNameplateDocument()); }
 
     protected recreateNameplates() {
       this.nameplates.forEach(nameplate => nameplate.destroy());
       this.nameplates.splice(0, this.nameplates.length);
 
-      const config = this.getFlags();
+      const config = this.getNameplateFlags();
       if (!config.enabled) return;
 
       for (const plateConfig of config.nameplates) {
@@ -64,6 +64,10 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
           return true;
         case "none":
           return false;
+        case "owner":
+          return this.isOwner;
+        case "control":
+          return this.controlled;
         case "ownerHover":
           return this.isOwner && this.hover;
         case "hover":
@@ -218,7 +222,7 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
         this.clearContainer(this.rightContainer);
       }
 
-      const config = this.getFlags();
+      const config = this.getNameplateFlags();
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if ((this as any).nameplate && config.enabled) (this as any).nameplate.renderable = false;
@@ -280,6 +284,9 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       this.addChild(this.bottomContainer);
       this.addChild(this.rightContainer);
       this.addChild(this.leftContainer);
+
+      this.topContainer.zIndex = this.bottomContainer.zIndex = this.leftContainer.zIndex = this.rightContainer.zIndex = 1;
+      
 
       void this.refreshNameplates(true);
     }

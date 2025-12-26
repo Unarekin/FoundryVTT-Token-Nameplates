@@ -7,7 +7,7 @@ import { TokenDisplayHash } from "settings";
 export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.Token>(base: t) {
   return class NameplateToken extends NameplatePlaceableMixin<t>(base) {
 
-    protected getFlagDocument(): TokenDocument | Actor {
+    protected getNameplateDocument(): TokenDocument | Actor {
       if (this.document.getFlag(__MODULE_ID__, "useTokenOverride") && this.document.getFlag(__MODULE_ID__, "enabled"))
         return this.document;
 
@@ -42,8 +42,8 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
       return "default"
     }
 
-    protected getFlags(): NameplateConfiguration {
-      const localFlags = getNameplateSettings(this.getFlagDocument());
+    protected getNameplateFlags(): NameplateConfiguration {
+      const localFlags = getNameplateSettings(this.getNameplateDocument());
       const defaultSettings = getDefaultSettings();
 
       // First check to see if there are settings on the token or actor
