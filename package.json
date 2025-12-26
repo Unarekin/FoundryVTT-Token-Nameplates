@@ -1,6 +1,6 @@
 {
   "name": "foundryvtt-token-nameplates",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "",
   "main": "dist/module.js",
   "scripts": {
