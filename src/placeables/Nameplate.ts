@@ -100,7 +100,7 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
           (this.glow as any).color = this.getDispositionColor(placeable);
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (this.glow as any).color = typeof glow.color === "string" ? glow.color : "#FFFFFF";
+          (this.glow as any).color = (typeof glow.color === "string" && glow.color) ? glow.color : "#FFFFFF";
         }
       } else {
         this.glow.enabled = false;
@@ -120,7 +120,7 @@ export class Nameplate extends foundry.canvas.containers.PreciseText {
           (this.outline as any).color = this.getDispositionColor(placeable);
         } else {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (this.outline as any).color = typeof outline.color === "string" ? outline.color : "#FFFFFF";
+          (this.outline as any).color = (typeof outline.color === "string" && outline.color) ? outline.color : "#FFFFFF";
         }
       } else {
         this.outline.enabled = false;

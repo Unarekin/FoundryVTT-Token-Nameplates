@@ -15,7 +15,7 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
   // eslint-disable-next-line no-unused-private-class-members
   #reject: ((err: Error) => void) | undefined = undefined;
   #submitted = false;
-  #actorType: string;
+  #actorType = "";
 
   public static DEFAULT_OPTIONS: DeepPartial<foundry.applications.api.ApplicationV2.Configuration> = {
     window: {
@@ -147,6 +147,15 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     return this.#promise;
   }
 
+  protected ensureColor(source: PIXI.ColorSource, defaultValue: string): string {
+    try {
+      const color = new PIXI.Color(source);
+      return color.toHex();
+    } catch {
+      return defaultValue;
+    }
+  }
+
   protected _onClose(options: foundry.applications.api.ApplicationV2.RenderOptions): void {
 
     super._onClose(options);
@@ -168,6 +177,11 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     const ctx = previewCanvas.getContext("2d");
     if (!ctx) return;
     ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+
+    if (this.#config) {
+      foundry.utils.setProperty(this.#config, "style.fill", this.ensureColor(this.#config.style?.fill as PIXI.ColorSource, "white"));
+      foundry.utils.setProperty(this.#config, "style.dropShadowColor", this.ensureColor(this.#config.style?.dropShadowColor as PIXI.ColorSource, "black"));
+    }
 
     const text = new foundry.canvas.containers.PreciseText("Sample Text", this.#config.style);
     // text.style = this.#config.style;

@@ -40,15 +40,25 @@
     <color-picker
       value="{{nameplate.style.fill}}"
       name="style.fill"
+      required
       id="{{idPrefix}}-fill"
     ></color-picker>
     <p class="hint">{{localize "NAMEPLATES.CONFIG.FONT.COLOR.HINT"}}</p>
   </div>
 
   <div class="form-group">
-    <label for="{{idPrefix}}-fontDispositionColor">{{localize "NAMEPLATES.CONFIG.FONT.DISPOSITIONCOLOR.LABEL"}}</label>
-    <input type="checkbox" id="{{idPrefix}}-fontDispositionColor" name="fontDispositionColor" {{checked nameplate.fontDispositionColor}}>
-    <p class="hint">{{localize "NAMEPLATES.CONFIG.FONT.DISPOSITIONCOLOR.HINT"}}</p>
+    <label for="{{idPrefix}}-fontDispositionColor">{{localize
+        "NAMEPLATES.CONFIG.FONT.DISPOSITIONCOLOR.LABEL"
+      }}</label>
+    <input
+      type="checkbox"
+      id="{{idPrefix}}-fontDispositionColor"
+      name="fontDispositionColor"
+      {{checked nameplate.fontDispositionColor}}
+    />
+    <p class="hint">{{localize
+        "NAMEPLATES.CONFIG.FONT.DISPOSITIONCOLOR.HINT"
+      }}</p>
   </div>
 
   <div class="form-group">
@@ -71,6 +81,7 @@
     <color-picker
       name="style.dropShadowColor"
       id="{{idPrefix}}-dropShadowColor"
+      required
       value="{{nameplate.style.dropShadowColor}}"
     ></color-picker>
     <p class="hint">{{localize
