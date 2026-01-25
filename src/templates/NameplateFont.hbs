@@ -60,48 +60,4 @@
         "NAMEPLATES.CONFIG.FONT.DISPOSITIONCOLOR.HINT"
       }}</p>
   </div>
-
-  <div class="form-group">
-    <label for="{{idPrefix}}-dropShadow">{{localize
-        "NAMEPLATES.CONFIG.FONT.DROPSHADOW.LABEL"
-      }}</label>
-    <input
-      type="checkbox"
-      name="style.dropShadow"
-      id="{{idPrefix}}-dropShadow"
-      {{checked nameplate.style.dropShadow}}
-    />
-    <p class="hint">{{localize "NAMEPLATES.CONFIG.FONT.DROPSHADOW.HINT"}}</p>
-  </div>
-
-  <div class="form-group">
-    <label for="{{idPrefix}}-dropShadowColor">{{localize
-        "NAMEPLATES.CONFIG.FONT.DROPSHADOWCOLOR.LABEL"
-      }}</label>
-    <color-picker
-      name="style.dropShadowColor"
-      id="{{idPrefix}}-dropShadowColor"
-      required
-      value="{{nameplate.style.dropShadowColor}}"
-    ></color-picker>
-    <p class="hint">{{localize
-        "NAMEPLATES.CONFIG.FONT.DROPSHADOWCOLOR.HINT"
-      }}</p>
-  </div>
-
-  <div class="form-group">
-    <label for="{{idPrefix}}-dropShadowAlpha">{{localize
-        "NAMEPLATES.CONFIG.FONT.DROPSHADOWALPHA.LABEL"
-      }}</label>
-    <range-picker
-      name="style.dropShadowAlpha"
-      id="{{idPrefix}}-dropShadowAlpha"
-      value="{{nameplate.style.dropShadowAlpha}}"
-      min="0"
-      max="1"
-    ></range-picker>
-    <p class="hint">{{localize
-        "NAMEPLATES.CONFIG.FONT.DROPSHADOWALPHA.HINT"
-      }}</p>
-  </div>
 </div>
