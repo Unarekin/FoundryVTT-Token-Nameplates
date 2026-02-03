@@ -49,6 +49,9 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     font: {
       template: `modules/${__MODULE_ID__}/templates/NameplateFont.hbs`
     },
+    dropshadow: {
+      template: `modules/${__MODULE_ID__}/templates/NameplateDropShadow.hbs`
+    },
     effects: {
       template: `modules/${__MODULE_ID__}/templates/NameplateEffects.hbs`,
       templates: [
@@ -79,6 +82,14 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
           active: false,
           cssClass: "",
           icon: "fa-solid fa-paragraph"
+        },
+        {
+          id: "dropshadow",
+          group: "primary",
+          label: "NAMEPLATES.CONFIG.TABS.DROPSHADOW",
+          active: false,
+          cssClass: "",
+          icon: "fa-solid fa-lightbulb",
         },
         {
           id: "effects",
@@ -119,7 +130,10 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
 
   // eslint-disable-next-line @typescript-eslint/require-await
   static async FormHandler(this: NameplateConfigApplication, e: SubmitEvent | Event, elem: HTMLElement, data: foundry.applications.ux.FormDataExtended) {
-    const parsed = foundry.utils.expandObject(data.object);
+    const parsed = foundry.utils.expandObject(data.object) as DeepPartial<SerializedNameplate>
+
+    if (typeof parsed.style?.sort === "string") parsed.style.sort = parseInt(parsed.style.sort);
+    if (typeof parsed.style?.dropShadowAngle === "number") parsed.style.dropShadowAngle *= (Math.PI / 180);
     if (this.#config) foundry.utils.mergeObject(this.#config, parsed);
     this.#submitted = true;
   }
@@ -262,6 +276,8 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
 
     if (this.element instanceof HTMLFormElement && this.#config) {
       const data = foundry.utils.expandObject(new foundry.applications.ux.FormDataExtended(this.element).object) as SerializedNameplate;
+      if (typeof data.style.dropShadowAngle === "number")
+        data.style.dropShadowAngle *= (Math.PI / 180);
       foundry.utils.mergeObject(this.#config.style, data.style);
       this.renderPreview();
     }
@@ -304,6 +320,10 @@ export class NameplateConfigApplication extends foundry.applications.api.Handleb
     context.displaySelect = generateDisplaySelectOptions();
 
     context.idPrefix = this.#config?.id ?? "";
+
+    // Convert radians to degrees for display purposes
+    if (typeof context.nameplate.style.dropShadowAngle === "number")
+      context.nameplate.style.dropShadowAngle *= (180 / Math.PI);
 
     context.buttons = [
       { type: "button", icon: "fa-solid fa-times", label: "Cancel", action: "cancel" },

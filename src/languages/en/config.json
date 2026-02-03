@@ -106,9 +106,17 @@
           "HINT": "Opacity of the drop shadow, if any",
           "LABEL": "Drop Shadow Alpha"
         },
+        "DROPSHADOWANGLE": {
+          "HINT": "The drop shadow's projection angle. 0 = directly to the right",
+          "LABEL": "Drop Shadow Angle"
+        },
         "DROPSHADOWCOLOR": {
           "HINT": "The color of the drop shadow, if any",
           "LABEL": "Drop Shadow Color"
+        },
+        "DROPSHADOWDISTANCE": {
+          "HINT": "The drop shadow's offset distance in pixels",
+          "LABEL": "Drop Shadow Distance"
         },
         "FAMILY": {
           "HINT": "The font for this nameplate.",
@@ -167,6 +175,7 @@
       },
       "TABS": {
         "BASICS": "Basics",
+        "DROPSHADOW": "Drop Shadow",
         "EFFECTS": "Effects",
         "FONT": "Font",
         "GLOW": "Glow",

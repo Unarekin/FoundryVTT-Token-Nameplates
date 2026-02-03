@@ -27,15 +27,14 @@ Hooks.once("init", () => {
     }
   }
 
-
-  const NameplateToken = NameplateTokenMixin<typeof foundry.canvas.placeables.Token>(CONFIG.Token.objectClass);
-
-  CONFIG.Token.objectClass = NameplateToken;
-
-
-  game.TokenNameplates.classes.NameplateToken = NameplateToken;
-
 });
+
+Hooks.once("canvasConfig", () => {
+  const NameplateToken = NameplateTokenMixin<typeof foundry.canvas.placeables.Token>(CONFIG.Token.objectClass);
+  CONFIG.Token.objectClass = NameplateToken;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  (game as any).TokenNameplates.classes.NameplateToken = NameplateToken;
+})
 
 Hooks.once("ready", () => {
   // Apply token configuration mixin.
