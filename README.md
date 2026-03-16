@@ -14,6 +14,8 @@
   - [Global Configurations](#global-configurations)
   - [String Interpolation](#string-interpolation)
 - [Support](#support)
+- [Socials](#socials)
+- [100% Human Made](#100-human-made)
 
 
 # Token Nameplates
@@ -64,5 +66,11 @@ Special thanks to Element_Re for his configuration for [Token Variant Art](https
 
 
 # Support
-<a href='https://ko-fi.com/C0C2156VW2' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+Do please consider throwing me a few bucks over on [Ko-Fi](https://ko-fi.com/unarekin) or [Patreon](https://www.patreon.com/BattleTransitions) if you like what you see and are feeling generous.  Every little bit helps.
 
+# Socials
+- [Linktree](https://linktr.ee/EricasCodebin)
+- [Discord](https://discord.gg/RaFYSW9Vcp)
+
+# 100% Human-made
+This module contains exactly 0% AI-generated content, whether that be code generation, code *completion*, documentation, art assets, etc.  None, never.  I don't need a torment nexus to write bad code, I can do that well enough on my own.
