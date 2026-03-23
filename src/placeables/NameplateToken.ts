@@ -23,6 +23,12 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
       }
     }
 
+    protected shouldDisplay(plate: Nameplate): boolean {
+      if (this.document?.disposition === -2) return false;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      return super.shouldDisplay(plate) as boolean;
+    }
+
 
     public get nameplateConfigSource(): NameplateConfigurationSource {
       if (this.document.getFlag(__MODULE_ID__, "useTokenOverride") && this.document.getFlag(__MODULE_ID__, "enabled"))
