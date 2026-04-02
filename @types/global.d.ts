@@ -1,5 +1,6 @@
 import { TokenNameplates } from "types";
 
+declare module '*.scss';
 declare global {
 
   declare const __DEV__: boolean;
@@ -8,21 +9,16 @@ declare global {
   const __MODULE_ID__ = "token-nameplates";
   declare const __MODULE_VERSION__: string;
 
-
-  declare module '*.scss';
-  declare const libWrapper: any;
-
   interface Game {
     TokenNameplates: TokenNameplates;
   }
+}
 
+declare module "fvtt-types/configuration" {
+  interface SettingConfig {
+    "token-nameplates.invertIsometryTransform": boolean;
+    "token-nameplates.globalConfigurations": Record<string, NameplateConfiguration>;
 
-
-  interface SettingsConfig {
-    [__MODULE_ID__]: {
-      invertIsometryTransform: boolean;
-      globalConfigurations: Record<string, NameplateConfiguration>
-    } // Placeholder for later
   }
 
   interface FlagConfig {
