@@ -64,14 +64,24 @@ Hooks.once("ready", () => {
   });
 
   game.settings?.register(__MODULE_ID__, "invertIsometryTransform", {
-    name: "Invert Isometry",
-    label: game.i18n?.localize("NAMEPLATES.SETTINGS.INVERTISOMETRY.LABEL"),
+    name: game.i18n?.localize("NAMEPLATES.SETTINGS.INVERTISOMETRY.LABEL"),
     hint: game.i18n?.localize("NAMEPLATES.SETTINGS.INVERTISOMETRY.HINT") ?? "",
     scope: "world",
     requiresReload: false,
     type: Boolean,
     default: false,
     config: !!game.modules.get("isometric-perspective")?.active,
+    onChange() { game?.TokenNameplates?.refreshAllTokens(); }
+  });
+
+  game.settings?.register(__MODULE_ID__, "placeAbovePlaceables", {
+    name: game.i18n?.localize("NAMEPLATES.SETTINGS.PLACEABOVEPLACEABLES.LABEL"),
+    hint: game.i18n?.localize("NAMEPLATES.SETTINGS.PLACEABOVEPLACEABLES.HINT") ?? "",
+    scope: "world",
+    requiresReload: false,
+    type: Boolean,
+    default: false,
+    config: true,
     onChange() { game?.TokenNameplates?.refreshAllTokens(); }
   })
 

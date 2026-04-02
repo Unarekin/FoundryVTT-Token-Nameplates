@@ -1,19 +1,23 @@
 {
   "NAMEPLATES": {
     "SETTINGS": {
-      "INVERTISOMETRY": {
-        "LABEL": "Invert Isometry Transform",
-        "HINT": "If enabled, will undo the perspective changes of isometric projection modules for nameplates"
-      },
       "GLOBAL": {
-        "LABEL": "Configure",
-        "TEXT": "Global Settings",
         "HINT": "Configure default nameplate settings",
+        "LABEL": "Configure",
         "LIST": {
-          "TITLE": "Global Nameplate Settings",
-          "DESCRIPTION": "Configure global nameplate settings for type:"
+          "DESCRIPTION": "Configure global nameplate settings for type:",
+          "TITLE": "Global Nameplate Settings"
         },
+        "TEXT": "Global Settings",
         "TITLE": "Global Nameplate Settings: {type}"
+      },
+      "INVERTISOMETRY": {
+        "HINT": "If enabled, will undo the perspective changes of isometric projection modules for nameplates",
+        "LABEL": "Invert Isometry Transform"
+      },
+      "PLACEABOVEPLACEABLES": {
+        "HINT": "When enabled, nameplates will always be displayed above tokens, tiles, and other placeables",
+        "LABEL": "Place Nameplates Above Tokens"
       }
     }
   }

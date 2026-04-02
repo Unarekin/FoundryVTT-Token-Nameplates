@@ -16,7 +16,7 @@ Hooks.once("canvasReady", () => {
 Hooks.once("init", () => {
 
   game.TokenNameplates = {
-    refreshAllTokens() { canvas?.scene?.tokens.forEach((token: TokenDocument) => { (token.object as NameplatePlaceable | null)?.refreshNameplates(); }) },
+    refreshAllTokens(force = false) { canvas?.scene?.tokens.forEach((token: TokenDocument) => { (token.object as NameplatePlaceable | null)?.refreshNameplates(force); }) },
     refreshTokensWithPrototype(prototype: foundry.data.PrototypeToken) {
       canvas?.scene?.tokens.forEach((token: TokenDocument) => {
         if (token.actor?.prototypeToken === prototype) (token.object as unknown as NameplatePlaceable).refreshNameplates(true);
