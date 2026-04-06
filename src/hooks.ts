@@ -1,5 +1,5 @@
 import { NameplatePlaceable } from "types";
-import { PrototypeTokenConfigMixin, TokenConfigMixin } from "./applications";
+import { PrototypeTokenConfigMixin, TileConfigMixin, TokenConfigMixin } from "./applications";
 import { NameplateTokenMixin, NameplateTileMixin } from "./placeables"
 
 Hooks.once("canvasReady", () => {
@@ -57,7 +57,7 @@ Hooks.once("ready", () => {
   applyMixin(CONFIG.Token.sheetClasses.base, TokenConfigMixin);
   CONFIG.Token.prototypeSheetClass = PrototypeTokenConfigMixin(CONFIG.Token.prototypeSheetClass as any);
 
-  // applyMixin(CONFIG.Tile.sheetClasses.base, TileConfigMixin);
+  applyMixin(CONFIG.Tile.sheetClasses.base, TileConfigMixin);
 
 });
 
