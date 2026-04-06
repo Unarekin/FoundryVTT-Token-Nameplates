@@ -1,5 +1,5 @@
 import { NameplatePlaceable } from "types";
-import { TokenConfigMixin } from "./applications";
+import { PrototypeTokenConfigMixin, TokenConfigMixin } from "./applications";
 import { NameplateTokenMixin } from "./placeables"
 
 Hooks.once("canvasReady", () => {
@@ -47,7 +47,7 @@ Hooks.once("ready", () => {
     CONFIG.Token.sheetClasses.base[key].cls = mixed as any;
   }
 
-  CONFIG.Token.prototypeSheetClass = TokenConfigMixin(CONFIG.Token.prototypeSheetClass as any);
+  CONFIG.Token.prototypeSheetClass = PrototypeTokenConfigMixin(CONFIG.Token.prototypeSheetClass as any);
 
 });
 
