@@ -21,10 +21,10 @@ export function ConfigMixin<Document extends foundry.abstract.Document.Any = fou
         addNameplate: NameplateConfig.AddNameplate,
         // eslint-disable-next-line @typescript-eslint/unbound-method
         editNameplate: NameplateConfig.EditNameplate,
-        //         // eslint-disable-next-line @typescript-eslint/unbound-method
-        //         moveNameplateDown: TokenConfiguration.MoveNameplateDown,
-        //         // eslint-disable-next-line @typescript-eslint/unbound-method
-        //         moveNameplateUp: TokenConfiguration.MoveNameplateUp,
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        moveNameplateDown: NameplateConfig.MoveNameplateDown,
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        moveNameplateUp: NameplateConfig.MoveNameplateUp,
         // eslint-disable-next-line @typescript-eslint/unbound-method
         removeNameplate: NameplateConfig.RemoveNameplate,
         //         // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -65,6 +65,64 @@ export function ConfigMixin<Document extends foundry.abstract.Document.Any = fou
     protected abstract getNameplateConfigSource(): NameplateConfigurationSource | undefined;
     protected abstract getNameplateInterpolationData(): Record<string, unknown>;
     protected abstract getNameplateInterpolationDocument(): foundry.abstract.Document.Any;
+
+    protected resortNameplates() {
+      ["bottom", "left", "right"]
+        .forEach(pos => {
+          (this.nameplateConfigOverride?.nameplates ?? []).filter(plate => plate.position === pos)
+            .forEach((plate, i) => { plate.sort = i });
+        });
+
+      (this.nameplateConfigOverride?.nameplates ?? []).filter(plate => plate.position === "top")
+        .toReversed()
+        .forEach((plate, i) => { plate.sort = i; });
+    }
+
+    static async MoveNameplateDown(this: NameplateConfig, e: PointerEvent, elem: HTMLElement) {
+      try {
+        if (!this.nameplateConfigOverride) return console.warn("No configuration loaded");
+
+        const id = elem.dataset.nameplate;
+        if (!id) throw new LocalizedError("MISSINGNAMEPLATEID");
+        const index = this.nameplateConfigOverride.nameplates.findIndex(item => item.id === id);
+        if (index === -1) throw new LocalizedError("NAMEPLATENOTFOUND");
+        if (index === this.nameplateConfigOverride.nameplates.length - 1) return;
+
+        const nameplate = this.nameplateConfigOverride.nameplates[index];
+        this.nameplateConfigOverride.nameplates[index] = this.nameplateConfigOverride.nameplates[index + 1];
+        this.nameplateConfigOverride.nameplates[index + 1] = nameplate;
+
+        this.resortNameplates();
+        await this.render();
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error) ui.notifications?.error(err.message, { console: false, localize: true });
+      }
+    }
+
+    static async MoveNameplateUp(this: NameplateConfig, e: PointerEvent, elem: HTMLElement) {
+      try {
+        if (!this.nameplateConfigOverride) return console.warn("No configuration loaded");
+
+        const id = elem.dataset.nameplate;
+        if (!id) throw new LocalizedError("MISSINGNAMEPLATEID");
+        const index = this.nameplateConfigOverride.nameplates.findIndex(item => item.id === id);
+        if (index === -1) throw new LocalizedError("NAMEPLATENOTFOUND");
+        if (index === 0) return;
+
+        const nameplate = this.nameplateConfigOverride.nameplates[index];
+        this.nameplateConfigOverride.nameplates[index] = this.nameplateConfigOverride.nameplates[index - 1];
+        this.nameplateConfigOverride.nameplates[index - 1] = nameplate;
+
+
+        this.resortNameplates();
+
+        await this.render();
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error) ui.notifications?.error(err.message, { console: false, localize: true });
+      }
+    }
 
     static async RemoveNameplate(this: NameplateConfig, e: PointerEvent, elem: HTMLElement) {
       try {
