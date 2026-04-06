@@ -76,7 +76,6 @@ export function getDefaultSettings(): NameplateConfiguration {
     enabled: false,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     version: __MODULE_VERSION__ as any,
-    useTokenOverride: false,
     nameplates: [
       {
         ...getDefaultNameplate(),
@@ -167,16 +166,16 @@ export function deepFlatten(obj: Record<string, unknown>): Record<string, unknow
   // We pass an array of visited objects to prevent circular references within
   // a given property hierarchy, but to allow referring to the same object in sibling leafs
   // Mostly for the 'actor.system' and 'system' properties, tbh.
-  function step(object: Record<string, unknown>, prev = "", currentDepth = 1, objects: object[]=[]) {
+  function step(object: Record<string, unknown>, prev = "", currentDepth = 1, objects: object[] = []) {
     Object.keys(object).forEach(key => {
       if (!key.startsWith("_")) {
         const value = object[key];
-          const type = Object.prototype.toString.call(value);
-          const isObject = type === "[object Object]" || type === "[object Array]";
-          const newKey = prev ? `${prev}.${key}` : key;
-          if (!objects.includes(value as object) && !Array.isArray(value) && isObject && Object.keys(value as Record<string, unknown>).length && currentDepth < maxDepth)
-            return step(value as Record<string, unknown>, newKey, currentDepth + 1, [...objects, ...(isObject ? [value as object] : [])]);
-          output[newKey] = value;
+        const type = Object.prototype.toString.call(value);
+        const isObject = type === "[object Object]" || type === "[object Array]";
+        const newKey = prev ? `${prev}.${key}` : key;
+        if (!objects.includes(value as object) && !Array.isArray(value) && isObject && Object.keys(value as Record<string, unknown>).length && currentDepth < maxDepth)
+          return step(value as Record<string, unknown>, newKey, currentDepth + 1, [...objects, ...(isObject ? [value as object] : [])]);
+        output[newKey] = value;
       }
     });
   }

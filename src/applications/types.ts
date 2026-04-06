@@ -1,4 +1,26 @@
-import { SerializedNameplate, NameplatePosition, NameplateDisplay, NameplateConfiguration } from "../types";
+import { SerializedNameplate, NameplatePosition, NameplateDisplay, NameplateConfiguration, NameplateConfigurationSource } from "../types";
+
+export interface SerializedNameplateContext extends SerializedNameplate {
+  actualValue: string;
+}
+
+export interface RenderContext<t extends foundry.abstract.Document.Any> extends foundry.applications.api.DocumentSheetV2.RenderContext<t> {
+  nameplates: {
+    upperNameplates: SerializedNameplateContext[];
+    lowerNameplates: SerializedNameplateContext[];
+    rightNameplates: SerializedNameplateContext[];
+    leftNameplates: SerializedNameplateContext[];
+    controlsDisabled: boolean;
+    enabled: boolean;
+    allowSourceConfig: boolean;
+    configSource: NameplateConfigurationSource;
+    configSourceSelect: Partial<Record<NameplateConfigurationSource, string>>;
+  }
+}
+
+export type RenderOptions = foundry.applications.api.DocumentSheetV2.RenderOptions;
+export type Configuration<t extends foundry.abstract.Document.Any = foundry.abstract.Document.Any> = foundry.applications.api.DocumentSheetV2.Configuration<t>
+
 
 export interface NameplateConfigContext extends foundry.applications.api.ApplicationV2.RenderContext {
   tabs?: Record<string, foundry.applications.api.ApplicationV2.Tab>;

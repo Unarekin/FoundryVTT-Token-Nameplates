@@ -129,11 +129,15 @@
       },
       "HEADER": "Nameplates",
       "IMPORT": {
+        "ACTOR": "Import from actor settings",
         "CLIPBOARD": "Import from Clipboard",
         "DIALOGMESSAGE": "Paste the JSON below",
+        "GLOBAL": "Import from global settings",
         "HINT": "Import JSON configuration",
         "LABEL": "Import Configuration",
         "PASTED": "Configuration read from clipboard",
+        "TOKEN": "Import from token settings",
+        "TYPE": "Import from actor type ({type}) settings",
         "UPLOAD": "Upload JSON"
       },
       "LEFT": "Left Nameplates",
@@ -166,12 +170,10 @@
       },
       "RIGHT": "Right Nameplates",
       "SOURCE": {
-        "ACTOR": "This item currently uses settings from its <strong>actor</strong>",
-        "ACTORTYPE": "This item currently uses settings from its <strong> actor type ({actorType})</strong>",
-        "DEFAULT": "This item uses the built-in <strong>default</strong> settings",
-        "GLOBAL": "This item currently uses the <strong>global</strong> settings",
-        "TILE": "This item uses settings from its <strong>tile</strong.",
-        "TOKEN": "This item uses settings from its <strong>token</strong>"
+        "DISABLED": "Controls disabled because of configuration source.",
+        "HINT": "Select from where this token should get its nameplate configuration",
+        "LABEL": "Configuration Source",
+        "TYPE": "Actor type ({type})"
       },
       "TABS": {
         "BASICS": "Basics",
@@ -203,6 +205,11 @@
         "HINT": "The value of the label.<br>See <a href='https://github.com/Unarekin/FoundryVTT-Token-Nameplates/wiki/Interpolation'>the wiki</a> for information about string interpolation.",
         "LABEL": "Value"
       }
+    }
+  },
+  "TILE": {
+    "TABS": {
+      "nameplates": "Nameplates"
     }
   },
   "TOKEN": {

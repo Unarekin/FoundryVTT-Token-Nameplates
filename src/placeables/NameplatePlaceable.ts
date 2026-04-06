@@ -5,10 +5,11 @@ import { getNameplateSettings } from "functions";
 
 export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeables.PlaceableObject>(base: t): t {
   abstract class NameplatePlaceable extends base {
+    private readonly nameContainer = new PIXI.Container();
     private readonly bottomContainer = new PIXI.Container();
     private readonly topContainer = new PIXI.Container();
     private readonly rightContainer = new PIXI.Container();
-    private leftContainer = new PIXI.Container();
+    private readonly leftContainer = new PIXI.Container();
 
     public abstract isOwner: boolean;
     public abstract hover: boolean;
@@ -98,12 +99,18 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       // return !!((game.settings?.settings as any).get(`${__MODULE_ID__}.invertIsometryTransform`) && game.settings?.get(__MODULE_ID__, "invertIsometryTransform") && (this.scene.flags as any)["isometric-perspective"]?.isometricEnabled && !((this.document as any).flags["isometric-perspective"] as IsometricFlags).isoTokenDisabled);
     }
 
+    protected shouldMoveNameplateToPlaceable = false;
+
+    protected getBasePlaceablePosition(): { x: number, y: number } {
+      return { x: 0, y: 0 };
+    }
+
     protected positionNameplates(list: Nameplate[], up = false, initialY = 0) {
       const { width } = this.bounds;
       const sorted = list.toSorted((a, b) => a.sort - b.sort);
 
-      let y = initialY;
-      let xAdjust = 0;
+      let y = initialY //+ this.y;
+      let xAdjust = 0
 
 
       if (this.shouldInvertIsometry && (this.document instanceof TokenDocument || this.document instanceof TileDocument)) {
@@ -135,16 +142,18 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
             case "left":
             case "justify":
               if (plate.autoAnchor) plate.anchor.x = 0;
-              plate.x = ((width / 2) - (plate.style.wordWrapWidth / 2)) - xAdjust + plate.padding.x;
+              plate.x = (((width / 2) - (plate.style.wordWrapWidth / 2)) - xAdjust + plate.padding.x);
               break;
             case "right":
               if (plate.autoAnchor) plate.anchor.x = 1;
-              plate.x = ((width / 2) + (plate.style.wordWrapWidth / 2)) - xAdjust + plate.padding.x;
+              plate.x = (((width / 2) + (plate.style.wordWrapWidth / 2)) - xAdjust + plate.padding.x);
               break;
             default:
               if (plate.autoAnchor) plate.anchor.x = 0.5;
-              plate.x = (width / 2) - xAdjust + plate.padding.x
+              plate.x = ((width / 2) - xAdjust + plate.padding.x);
           }
+
+          // plate.x += this.x;
 
         } else {
           plate.visible = false;
@@ -213,6 +222,16 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       children.forEach(child => { child.destroy(); })
     }
 
+    protected placeAbovePlaceables(): boolean {
+      return !!(game?.settings?.settings.get(`${__MODULE_ID__}.placeAbovePlaceables`) && game.settings.get(__MODULE_ID__, "placeAbovePlaceables"));
+    }
+
+    protected setContainerParent() {
+      const parent = this.placeAbovePlaceables() ? canvas?.tokens : this;
+      if (parent && parent !== this.nameContainer.parent)
+        parent.addChild(this.nameContainer);
+    }
+
     protected refreshNameplates(force = false) {
       if (force) {
         this.nameplates.splice(0, this.nameplates.length);
@@ -221,6 +240,8 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
         this.clearContainer(this.leftContainer);
         this.clearContainer(this.rightContainer);
       }
+
+      this.setContainerParent();
 
       const config = this.getNameplateFlags();
 
@@ -232,10 +253,24 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       if (!this.nameplates.length)
         this.recreateNameplates();
 
+      if (this.placeAbovePlaceables()) {
+        this.nameContainer.x = this.x;
+        this.nameContainer.y = this.y;
+      } else {
+        this.nameContainer.x = 0;
+        this.nameContainer.y = 0;
+      }
+
       this.positionTopNameplates();
       this.positionBottomNameplates();
       this.positionLeftNameplates();
       this.positionRightNameplates();
+
+      if (this.shouldMoveNameplateToPlaceable) {
+        const pos = this.getBasePlaceablePosition();
+        this.nameContainer.x = pos.x;
+        this.nameContainer.y = pos.y;
+      }
 
       const interpolationData = this.getInterpolationData();
       this.nameplates.forEach(plate => { plate.refreshText(interpolationData); });
@@ -273,20 +308,22 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     }
 
     constructor(doc: foundry.abstract.Document.Any) {
-      super(doc);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      super(doc as any);
+
+      this.nameContainer.name = `${this.id} - Nameplate Container`;
 
       this.bottomContainer.name = `${this.id} - Bottom Nameplates`;
       this.topContainer.name = `${this.id} - Top Nameplates`;
       this.leftContainer.name = `${this.id} - Left Nameplates`;
       this.rightContainer.name = `${this.id} - Right Nameplates`;
 
-      this.addChild(this.topContainer);
-      this.addChild(this.bottomContainer);
-      this.addChild(this.rightContainer);
-      this.addChild(this.leftContainer);
+
+      [this.topContainer, this.bottomContainer, this.rightContainer, this.leftContainer]
+        .forEach(container => { this.nameContainer.addChild(container); });
 
       this.topContainer.zIndex = this.bottomContainer.zIndex = this.leftContainer.zIndex = this.rightContainer.zIndex = 1;
-      
+
 
       void this.refreshNameplates(true);
     }

@@ -343,7 +343,7 @@ export class GlobalConfigApplication extends foundry.applications.api.Handlebars
     context.globalConfig = true;
 
     if (options.isFirstRender) {
-      const config = (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) as Record<string, NameplateConfiguration>;
+      const config = (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {});
 
       if (config[this.actorType]) {
         const cfg = config[this.actorType];
