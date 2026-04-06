@@ -34,14 +34,33 @@ export function NameplateTileMixin<t extends typeof foundry.canvas.placeables.Ti
       }
 
       const placeable = this as unknown as NameplatePlaceable;
-      placeable.topContainer.y = -(this.document.height / 2);
-      placeable.topContainer.x = 0;  //(this.document.width / 2);
 
-      placeable.bottomContainer.y = this.document.height / 2;
-      placeable.bottomContainer.x = 0;// (this.document.width / 2);
+      // TODO: This is probably not correct.
+      if (game?.release?.isNewer("14")) {
+        placeable.topContainer.y = -(this.document.height / 2);
+        placeable.topContainer.x = 0;  //(this.document.width / 2);
 
-      placeable.leftContainer.x = 0;
-      placeable.rightContainer.x = 0;
+        placeable.bottomContainer.y = this.document.height / 2;
+        placeable.bottomContainer.x = 0;// (this.document.width / 2);
+
+        placeable.leftContainer.x = -this.document.width * 1.75; // * 1.3;
+        placeable.leftContainer.y = -this.document.height / 2;
+
+        placeable.rightContainer.x = this.document.width * 1.75;
+        placeable.rightContainer.y = -this.document.height / 2;
+      } else {
+        placeable.topContainer.y = 0;
+        placeable.topContainer.x = this.document.width / 2;
+
+        placeable.bottomContainer.y = this.document.height;
+        placeable.bottomContainer.x = this.document.width / 2;
+
+        placeable.leftContainer.x = -this.document.width * 1.3;
+        placeable.leftContainer.y = 0;
+
+        placeable.rightContainer.x = this.document.width * 2.25;
+        placeable.rightContainer.y = 0;
+      }
     }
 
     protected setContainerParent() {
