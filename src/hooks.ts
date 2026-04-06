@@ -1,6 +1,6 @@
 import { NameplatePlaceable } from "types";
-import { PrototypeTokenConfigMixin, TokenConfigMixin } from "./applications";
-import { NameplateTokenMixin } from "./placeables"
+import { PrototypeTokenConfigMixin, TileConfigMixin, TokenConfigMixin } from "./applications";
+import { NameplateTokenMixin, NameplateTileMixin } from "./placeables"
 
 Hooks.once("canvasReady", () => {
   // Initialize Pixi DevTools if we are a debug build
@@ -30,24 +30,34 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("canvasConfig", () => {
-  const NameplateToken = NameplateTokenMixin<typeof foundry.canvas.placeables.Token>(CONFIG.Token.objectClass);
-  CONFIG.Token.objectClass = NameplateToken;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  (game as any).TokenNameplates.classes.NameplateToken = NameplateToken;
+  CONFIG.Token.objectClass = NameplateTokenMixin(CONFIG.Token.objectClass);
+  CONFIG.Tile.objectClass = NameplateTileMixin(CONFIG.Tile.objectClass);
+
+  if (game.TokenNameplates) {
+    game.TokenNameplates.classes ??= {};
+    game.TokenNameplates.classes.NameplateToken = CONFIG.Token.objectClass;
+    game.TokenNameplates.classes.NameplateTile = CONFIG.Tile.objectClass;
+  }
 })
+
+function applyMixin(collection: Record<string, any>, mixin: any) {
+  const entries = Object.entries(collection);
+  for (const [key, { cls }] of entries) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    const mixed = mixin(cls);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    collection[key].cls = mixed;
+  }
+}
+
 
 Hooks.once("ready", () => {
   // Apply token configuration mixin.
 
-
-  const entries = Object.entries(CONFIG.Token.sheetClasses.base);
-  for (const [key, { cls }] of entries) {
-    const mixed = TokenConfigMixin(cls as any);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    CONFIG.Token.sheetClasses.base[key].cls = mixed as any;
-  }
-
+  applyMixin(CONFIG.Token.sheetClasses.base, TokenConfigMixin);
   CONFIG.Token.prototypeSheetClass = PrototypeTokenConfigMixin(CONFIG.Token.prototypeSheetClass as any);
+
+  applyMixin(CONFIG.Tile.sheetClasses.base, TileConfigMixin);
 
 });
 
@@ -63,3 +73,7 @@ Hooks.on("updateToken", (token: TokenDocument) => {
     (token.object as unknown as NameplatePlaceable).refreshNameplates(true);
 });
 
+Hooks.on("updateTile", (tile: TileDocument) => {
+  if (tile.object)
+    (tile.object as unknown as NameplatePlaceable).refreshNameplates(true);
+})

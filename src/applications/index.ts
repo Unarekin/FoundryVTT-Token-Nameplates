@@ -3,4 +3,5 @@ export * from './ConfigMixin';
 export * from './GlobalConfig';
 export * from './NameplateConfig';
 export * from './PrototypeTokenConfig';
+export * from './TileConfig';
 export * from './TokenConfig';

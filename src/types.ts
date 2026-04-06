@@ -45,6 +45,12 @@ export interface NameplatePlaceable {
   refreshNameplates: (force?: boolean) => void;
   getInterpolationData: () => Record<string, unknown>;
   nameplateConfigSource: NameplateConfigurationSource;
+
+  nameContainer: PIXI.Container;
+  bottomContainer: PIXI.Container;
+  topContainer: PIXI.Container;
+  rightContainer: PIXI.Container;
+  leftContainer: PIXI.Container;
 }
 
 export interface SerializedNameplate {
