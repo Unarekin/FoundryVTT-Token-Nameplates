@@ -1,4 +1,4 @@
-import { TokenNameplates } from "types";
+import { NameplateConfiguration, NameplateConfigurationSource, TokenNameplates } from "types";
 
 declare module '*.scss';
 declare global {
@@ -35,12 +35,18 @@ declare module "fvtt-types/configuration" {
     Actor: {
       [__MODULE_ID__]: NameplateConfiguration
     },
-    TileDocument: {
-      [__MODULE_ID__]: NameplateConfiguration,
+    Tile: {
+      [__MODULE_ID__]: {
+        source: NameplateConfigurationSource;
+        config: NameplateConfiguration
+      },
       "isometric-perspective"?: IsometricFlags;
     },
-    TokenDocument: {
-      [__MODULE_ID__]: NameplateConfiguration,
+    Token: {
+      [__MODULE_ID__]: {
+        source: NameplateConfigurationSource;
+        config: NameplateConfiguration;
+      },
       "isometric-perspective"?: IsometricFlags;
     }
   }

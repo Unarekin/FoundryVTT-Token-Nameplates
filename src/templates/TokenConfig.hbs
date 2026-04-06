@@ -1,37 +1,30 @@
-<div class="tab{{#if tab.active}} active{{/if}} token-nameplates-config" data-group="sheet" data-tab="nameplates" data-application-part="nameplates" style="overflow-y:auto;overflow-x:hidden">
+<div class="tab scrollable{{#if tab.active}} active{{/if}}" data-group="sheet" data-tab="nameplates" data-application-part="nameplates">
   {{#with nameplates}}
-    <p class="hint">{{{configSourceDescription}}}</p>
-    <div class="form-group">
-      {{#if ../globalConfig }}
-        <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLEGLOBAL.LABEL"}}</label>
-        <input type="checkbox" id="{{idPrefix}}-nameplates-enabled" name="nameplates.enabled" {{checked enabled}}>
-        <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLEGLOBAL.HINT"}}</p>
-      {{else}}
-        <label for="{{idPrefix}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLE.LABEL"}}</label>
-        <input type="checkbox" id="{{idPrefix}}-nameplates-enabled" name="nameplates.enabled" {{checked enabled}}>
-        <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLE.HINT"}}</p>
+    {{#if allowSourceConfig}}
+      <div class="form-group">
+        <label for ="{{@root.rootId}}-nameplates-configSource">{{localize "NAMEPLATES.CONFIG.SOURCE.LABEL"}}</label>
+        <select id="{{@root.rootId}}-nameplates-configSource" name="nameplates.configSource">
+          {{selectOptions configSourceSelect selected=configSource localize=true}}
+        </select>
+      </div>
+      {{#if controlsDisabled}}
+        <p class="hint">{{localize "NAMEPLATES.CONFIG.SOURCE.DISABLED"}}</p>
       {{/if}}
+    {{/if}}
+
+    <div class="form-group">
+      <label for="{{@root.rootId}}-nameplates-enabled">{{localize "NAMEPLATES.CONFIG.ENABLE.LABEL"}}</label>
+      <input type="checkbox" name="nameplates.enabled" id="{{@root.rootId}}-nameplates-enabled" {{checked enabled}} data-toggle-nameplate-config>
+      <p class="hint">{{localize "NAMEPLATES.CONFIG.ENABLE.HINT"}}</p>
     </div>
 
-    {{#if showTokenOverrides}}
-      <div class="form-group">
-        <label for="{{idPrefix}}-nameplates-override">{{localize "NAMEPLATES.CONFIG.TOKENOVERRIDE.LABEL"}}</label>
-        <input type="checkbox" id="{{idPrefix}}-nameplates-override" name="nameplates.useTokenOverride" {{checked useTokenOverride}}>
-        <p class="hint">{{localize "NAMEPLATES.CONFIG.TOKENOVERRIDE.HINT"}}</p>
-      </div>
-      <button type="button" data-action="loadFromActor"{{#unless useTokenOverride}} style="display:none"{{/unless}}>{{localize "NAMEPLATES.CONFIG.LOADFROMACTOR"}}</button>
-      <button type="button" data-action="loadFromToken"{{#if useTokenOverride}} style="display:none"{{/if}}>{{localize "NAMEPLATES.CONFIG.LOADFROMTOKEN"}}</button>
-    {{else}}
-      <input type="checkbox" id="{{idPrefix}}-nameplates-override" name="nameplates.useTokenOverride" checked style="display:none">
-    {{/if}}
-    
     <div class="form-group">
       <div class="flexrow">
         <div class="flex1">
           <label for="{{idPrefix}}-nameplates-export">{{localize "NAMEPLATES.CONFIG.EXPORT.LABEL"}}</label>
         </div>
         <div class="flex0">
-          <a data-action="" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EXPORT"}}" data-role="export-nameplates">
+          <a data-action="" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EXPORT"}}" data-role="export-nameplates" data-toggle-nameplate-config>
             <i class="fa-solid fa-download"></i>
           </a>
         </div>
@@ -45,7 +38,7 @@
           <label for="{{idPrefix}}-nameplates-import">{{localize "NAMEPLATES.CONFIG.IMPORT.LABEL"}}</label>
         </div>
         <div class="flex0">
-          <a data-role="import-nameplates" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.IMPORT"}}">
+          <a data-role="import-nameplates" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.IMPORT"}}" data-toggle-nameplate-config>
             <i class="fa-solid fa-upload"></i>
           </a>
         </div>
@@ -58,7 +51,7 @@
         <h4 class="token-nameplate-list__header">{{localize "NAMEPLATES.CONFIG.HEADER"}}</h4>
       </div>
       <div class="flex0">
-        <a data-action="addNameplate" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.ADD"}}">
+        <a data-action="addNameplate" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.ADD"}}" data-toggle-nameplate-config>
           <i class="fa-solid fa-plus"></i>
         </a>
       </div>

@@ -1,4 +1,5 @@
 <section data-role="nameplate-list">
+  {{#if nameplates.length}}
   {{localize header }}
   <div class="token-nameplate-list" data-role="nameplate-list">
     <div class="token-nameplate-list__col"></div>
@@ -7,23 +8,24 @@
     <div class="token-nameplate-list__col"></div>
     {{#each nameplates as |nameplate i|}}
       <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
-        <a data-action="moveNameplateUp" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.UP"}}"{{#if @first}}  class="token-nameplate-list__col--disabled"{{/if}}>
+        <a data-action="moveNameplateUp" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.UP"}}"{{#if @first}}  class="token-nameplate-list__col--disabled"{{/if}} data-toggle-nameplate-config>
           <i class="fa-solid fa-caret-up"></i>
         </a>
-        <a data-action="moveNameplateDown" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.DOWN"}}"{{#if @last}}  class="token-nameplate-list__col--disabled"{{/if}}>
+        <a data-action="moveNameplateDown" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.DOWN"}}"{{#if @last}}  class="token-nameplate-list__col--disabled"{{/if}} data-toggle-nameplate-config>
           <i class="fa-solid fa-caret-down"></i>
         </a>
       </div>
       <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
-        <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}">{{nameplate.value}}</a>
+        <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}" data-toggle-nameplate-config>{{nameplate.value}}</a>
       </div>
       <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
-        <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}">{{nameplate.actualValue}}</a>
+        <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}" data-toggle-nameplate-config>{{nameplate.actualValue}}</a>
       </div>
       <div class="token-nameplate-list__col{{#if (isOdd i)}} token-nameplate-list__col--alt-row{{/if}}">
-        <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}"><i  class="fa-solid fa-gears"></i></a>
-        <a data-action="removeNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.REMOVE"}}"><i class="fa-solid fa-trash"></i></a>
+        <a data-action="editNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.EDIT"}}" data-toggle-nameplate-config><i  class="fa-solid fa-gears"></i></a>
+        <a data-action="removeNameplate" data-nameplate="{{nameplate.id}}" data-tooltip="{{localize "NAMEPLATES.CONFIG.TOOLTIPS.REMOVE"}}" data-toggle-nameplate-config><i class="fa-solid fa-trash"></i></a>
       </div>
     {{/each}}
   </div>
+  {{/if}}
 </section>

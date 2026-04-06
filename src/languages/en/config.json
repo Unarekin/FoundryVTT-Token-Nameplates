@@ -134,7 +134,11 @@
         "HINT": "Import JSON configuration",
         "LABEL": "Import Configuration",
         "PASTED": "Configuration read from clipboard",
-        "UPLOAD": "Upload JSON"
+        "UPLOAD": "Upload JSON",
+        "GLOBAL": "Import from global settings",
+        "ACTOR": "Import from actor settings",
+        "TOKEN": "Import from token settings",
+        "TYPE": "Import from actor type ({type}) settings"
       },
       "LEFT": "Left Nameplates",
       "LOADFROMACTOR": "Load Settings from Actor",
@@ -166,12 +170,10 @@
       },
       "RIGHT": "Right Nameplates",
       "SOURCE": {
-        "ACTOR": "This item currently uses settings from its <strong>actor</strong>",
-        "ACTORTYPE": "This item currently uses settings from its <strong> actor type ({actorType})</strong>",
-        "DEFAULT": "This item uses the built-in <strong>default</strong> settings",
-        "GLOBAL": "This item currently uses the <strong>global</strong> settings",
-        "TILE": "This item uses settings from its <strong>tile</strong.",
-        "TOKEN": "This item uses settings from its <strong>token</strong>"
+        "LABEL": "Configuration Source",
+        "HINT": "Select from where this token should get its nameplate configuration",
+        "TYPE": "Actor type ({type})",
+        "DISABLED": "Controls disabled because of configuration source."
       },
       "TABS": {
         "BASICS": "Basics",

@@ -1,7 +1,7 @@
 
-type Version = "1.1.0";
+type Version = "1.3.0";
 
-export const NameplateConfigurationSources = ["token", "actor", "actorType", "global", "tile", "default"] as const;
+export const NameplateConfigurationSources = ["token", "actor", "actorType", "global", "tile"] as const;
 export type NameplateConfigurationSource = typeof NameplateConfigurationSources[number];
 
 export type IsObject<T> = T extends Readonly<Record<string, any>>
@@ -93,7 +93,6 @@ export interface NameplateOutlineEffect extends NameplateEffect {
 export interface NameplateConfiguration {
   enabled: boolean;
   version: Version;
-  useTokenOverride: boolean;
   nameplates: SerializedNameplate[];
 }
 

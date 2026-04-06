@@ -1,6 +1,6 @@
 import { NameplateConfiguration, NameplateConfigurationSource, NameplateDisplay, NameplatePlaceable } from "types";
 import { NameplatePlaceableMixin } from "./NameplatePlaceable";
-import { getActorInterpolationData, getDefaultSettings, getNameplateSettings } from "functions";
+import { getActorInterpolationData, getDefaultSettings } from "functions";
 import { Nameplate } from "./Nameplate";
 import { TokenDisplayHash } from "settings";
 
@@ -31,40 +31,47 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
 
 
     public get nameplateConfigSource(): NameplateConfigurationSource {
-      if (this.document.getFlag(__MODULE_ID__, "useTokenOverride") && this.document.getFlag(__MODULE_ID__, "enabled"))
+
+      if (this.document.getFlag(__MODULE_ID__, "source")) return this.document.getFlag(__MODULE_ID__, "source");
+
+      // TODO: Remove eventually
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const doc = this.document as any;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      if (doc.getFlag(__MODULE_ID__, "useTokenOverride") && doc.getFlag(__MODULE_ID__, "enabled"))
         return "token";
       else if (this.actor?.getFlag(__MODULE_ID__, "enabled"))
         return "actor";
 
 
-      const globalConfig = (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) as Record<string, NameplateConfiguration>;
+      const globalConfig = game.settings?.settings.get(`${__MODULE_ID__}.globalConfigurations`) ? (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) : {};
       if (this.actor && globalConfig[this.actor.type]?.enabled)
         return "actorType";
 
 
-      if (globalConfig.global?.enabled)
-        return "global";
-
-      return "default"
+      return "global";
     }
 
     protected getNameplateFlags(): NameplateConfiguration {
-      const localFlags = getNameplateSettings(this.getNameplateDocument());
       const defaultSettings = getDefaultSettings();
+      const globalConfig = game.settings?.settings?.get(`${__MODULE_ID__}.globalConfigurations`) ? (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) : {};
 
-      // First check to see if there are settings on the token or actor
-      if (localFlags.enabled) return foundry.utils.mergeObject(defaultSettings, localFlags);
-
-      // Check to make sure the setting has been registered.  This can be called before the module has properly loaded.
-      if (game.settings?.settings.get(`${__MODULE_ID__}.globalConfigurations`)) {
-        // Now find type-based
-        const globalConfig = (game.settings?.get(__MODULE_ID__, "globalConfigurations") ?? {}) as Record<string, NameplateConfiguration>;
-        if (this.actor && globalConfig[this.actor.type]?.enabled) {
-          return foundry.utils.mergeObject(defaultSettings, globalConfig[this.actor.type]);
-        } else if (globalConfig?.global?.enabled) {
-          return foundry.utils.mergeObject(defaultSettings, globalConfig.global);
-        }
+      switch (this.nameplateConfigSource) {
+        case "actor":
+          foundry.utils.mergeObject(defaultSettings, this.actor?.flags[__MODULE_ID__] ?? {});
+          break;
+        case "tile":
+        case "token":
+          foundry.utils.mergeObject(defaultSettings, this.document?.flags[__MODULE_ID__]?.config ?? {});
+          break;
+        case "actorType":
+          if (this.actor && globalConfig[this.actor.type]) foundry.utils.mergeObject(defaultSettings, globalConfig[this.actor.type]);
+          break;
+        case "global":
+          if (globalConfig.global) foundry.utils.mergeObject(defaultSettings, globalConfig.global);
+          break;
       }
+
       return defaultSettings;
     }
 
