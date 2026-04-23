@@ -70,7 +70,7 @@ export function PrototypeTokenConfigMixin<t extends typeof foundry.applications.
         token: "DOCUMENT.Token",
         actor: "DOCUMENT.Actor",
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        actorType: game.i18n?.format("NAMEPLATES.CONFIG.SOURCE.TYPE", { type: token.actor?.type ? (game.i18n?.translations as any).TYPES.Actor[token.actor.type] ? game.i18n?.localize(`TYPES.Actor.${token.actor.type}`) : token.actor.type : "UNKNOWN" }) ?? "DOCUMENT.FIELDS.type.label",
+        actorType: game.i18n?.format("NAMEPLATES.CONFIG.SOURCE.TYPE", { type: token.actor?.type ? (game.i18n?.translations as any).TYPES.Actor?.[token.actor.type] ? game.i18n?.localize(`TYPES.Actor.${token.actor.type}`) : token.actor.type : "UNKNOWN" }) ?? "DOCUMENT.FIELDS.type.label",
         global: "NAMEPLATES.CONFIG.TYPES.GLOBAL"
       }
 
