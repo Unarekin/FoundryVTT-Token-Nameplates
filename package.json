@@ -1,6 +1,6 @@
 {
   "name": "foundryvtt-token-nameplates",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "A module for Foundry VTT to add customization options for token nameplates.",
   "main": "dist/module.js",
   "scripts": {
