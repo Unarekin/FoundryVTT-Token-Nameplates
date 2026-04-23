@@ -63,14 +63,17 @@ export function PrototypeTokenConfigMixin<t extends typeof foundry.applications.
       const context = await super._prepareContext(options) as unknown as RenderContext<foundry.documents.TokenDocument>;
       context.nameplates.allowSourceConfig = true;
 
+      // // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      // const token = (this as any).token as foundry.data.PrototypeToken;
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const token = (this as any).token as foundry.data.PrototypeToken;
+      const actor = (this as any).actor as Actor;
+      const actorType = (game.i18n && actor && actor && CONFIG.Actor.typeLabels[actor.type]) ? game.i18n.localize(CONFIG.Actor.typeLabels[actor.type]) : "UNKNOWN";
 
       context.nameplates.configSourceSelect = {
         token: "DOCUMENT.Token",
         actor: "DOCUMENT.Actor",
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        actorType: game.i18n?.format("NAMEPLATES.CONFIG.SOURCE.TYPE", { type: token.actor?.type ? (game.i18n?.translations as any).TYPES.Actor?.[token.actor.type] ? game.i18n?.localize(`TYPES.Actor.${token.actor.type}`) : token.actor.type : "UNKNOWN" }) ?? "DOCUMENT.FIELDS.type.label",
+        actorType: game.i18n?.format("NAMEPLATES.CONFIG.SOURCE.TYPE", { type: actorType }),
         global: "NAMEPLATES.CONFIG.TYPES.GLOBAL"
       }
 
