@@ -351,9 +351,7 @@ export function ConfigMixin<Document extends foundry.abstract.Document.Any = fou
 
       if (formData.configSource !== this.nameplateConfigSource) {
         this.nameplateConfigSource = formData.configSource as NameplateConfigurationSource;
-        console.log(foundry.utils.deepClone(this.nameplateConfigOverride))
         this.nameplateConfigOverride = this.getNameplateFlags(this.nameplateConfigSource);
-        console.log(foundry.utils.deepClone(this.nameplateConfigOverride))
         this.render().catch(console.error);
       }
     }

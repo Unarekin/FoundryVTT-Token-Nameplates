@@ -233,7 +233,6 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     }
 
     protected refreshNameplates(force = false) {
-      console.log("Refreshing nameplates");
       if (force) {
         this.nameplates.splice(0, this.nameplates.length);
         this.clearContainer(this.topContainer);
