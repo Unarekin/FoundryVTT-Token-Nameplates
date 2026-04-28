@@ -233,6 +233,7 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     }
 
     protected refreshNameplates(force = false) {
+      console.log("Refreshing nameplates");
       if (force) {
         this.nameplates.splice(0, this.nameplates.length);
         this.clearContainer(this.topContainer);
@@ -279,25 +280,36 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     protected _refreshPosition() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       super._refreshPosition();
-      void this.refreshNameplates();
+      this.refreshNameplates();
     }
 
     protected _refreshSize() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       super._refreshSize();
-      void this.refreshNameplates();
+      this.refreshNameplates();
     }
 
     protected _refreshMesh() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       super._refreshMesh();
-      void this.refreshNameplates();
+      this.refreshNameplates();
     }
 
     protected _refreshState() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       super._refreshState();
-      void this.refreshNameplates();
+      this.refreshNameplates();
+    }
+
+    protected _onHoverIn(event: Canvas.Event.Pointer, options?: PlaceableObject.HoverInOptions): false | void {
+      const hover = super._onHoverIn(event, options);
+      this.refreshNameplates();
+      return hover;
+    }
+
+    protected _onHoverOut(event: Canvas.Event.Pointer): void {
+      super._onHoverOut(event);
+      this.refreshNameplates();
     }
 
     protected _destroy(options?: PIXI.IDestroyOptions | boolean) {
