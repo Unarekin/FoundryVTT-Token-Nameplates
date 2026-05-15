@@ -91,6 +91,8 @@ export function NameplateTokenMixin<t extends typeof foundry.canvas.placeables.T
       if (this.actor)
         foundry.utils.mergeObject(data, getActorInterpolationData(this.actor));
 
+      data.tooltip = this.tooltip?.text ?? "";
+      console.log("Interpolation data:", data);
       return data;
     }
 
