@@ -79,6 +79,9 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     }
 
     protected shouldDisplay(plate: Nameplate): boolean {
+      console.log("shouldDisplay:", this.isVisible, this);
+      if (!this.isVisible) return false;
+
       const display = this.displayMode(plate);
       return this.displayConditionsMet(display);
     }
@@ -304,6 +307,12 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
       const hover = super._onHoverIn(event, options);
       this.refreshNameplates();
       return hover;
+    }
+
+    protected _refreshVisibility() {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      super._refreshVisibility();
+      this.refreshNameplates();
     }
 
     protected _onHoverOut(event: Canvas.Event.Pointer): void {
