@@ -79,7 +79,6 @@ export function NameplatePlaceableMixin<t extends typeof foundry.canvas.placeabl
     }
 
     protected shouldDisplay(plate: Nameplate): boolean {
-      console.log("shouldDisplay:", this.isVisible, this);
       if (!this.isVisible) return false;
 
       const display = this.displayMode(plate);
